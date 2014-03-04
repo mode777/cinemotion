@@ -5,14 +5,29 @@ local drawableTileset = {}
 
 function drawableTileset.new(path, Tilewidth, Tileheight)
     local quads
+    local batches = {}
+    setmetatable(batches,{__mode="k"})
     local tileWidth, tileHeight
+
 
     local i = drawable.new(path)
 
-    function i:draw(index)
+    function i:updateSpriteBatch(Grid)
+        if not batches[Grid] then
+            batches[Grid] = {}
+        end
+    end
+
+    function i:draw(index,sx1,sy1,sx2,sy2,ox1,oy1,ox2,oy2)
         index = index or 1
         local img = i:getImage()
-        if img then drawq(img,quads[index],0,0) end
+        if img then
+            if type(index) == "number" then --if index is a single tile
+                drawq(img,quads[index],0,0)
+            else --if index is a grid
+                local b = i:updateBatch(index,sx1,sy1,sx2,sy2,ox1,oy1,ox2,oy2)
+            end
+        end
     end
 
     function i:getSize(index)

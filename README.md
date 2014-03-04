@@ -102,12 +102,15 @@ A source can be a sound file, an image, a tileset, a spritesheet, a font and muc
 in-game sprites might share the same source.
 ```lua
     local text = cm.sprite.new(100,100,font,"Hello World")
-
     layer:addSprite(text)
 ```
 Now for the actual text on screen. We create a sprite, which is an object, that gets drawn to screen. In the parameters
  we first provide the X and Y coordinates for our sprite(100,100), provide a source (font) and provide an Index
  ("Hello World").
 
- An Index is, what connects a sprite and a source. Indices may vary depending of the kind of source used. On a tileset,
- it might be...
+ An Index is, what connects a sprite and a source. Indices may vary depending of the kind of source used. Basically the
+ index tells the engine what to do with the asset. Different sources take different indices. Fonts generally take strings,
+ Spritesheets take numerical indices or string-keys depending on how it was constructed, a tileset might take a numerical
+ index, to just draw a single tile, or a grid object to draw a whole tile layer.
+
+Last but not least we have to add our sprite into the layer, so the engine can draw it. Thats what the last line does.
