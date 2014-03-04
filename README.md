@@ -21,6 +21,46 @@ On windows this will be located in "C:\users\yourname\AppData\Roaming\LOVE\yourp
 
 Start the project like you would usually do with a love project (i.e. on windows: by running "love.exe foldername" or putting is into a zip file and renaming the extension to love)
 
+A simple menu will pop up, that let's your change your settings and run scene files. If you select "Run Scene" you will only see one entry, called "init.sce". This is the menu screen you're looking at right now.
 
+The first important thing to notice here is, that cinemotion organises it's game logic in scenes (you don't have to use them though).
+Think of a scene as the biggest distinguishable part of your game. It could be a level or a gui or a menu. So let's create a scene.
 
+####Our first scene
+
+Create a new file in your project root directory.
+Call it "helloworld.sce" and open it. (TIPP: You can set up your favourite code editor to treat it like a lua file, to get syntax highlighting)
+
+Paste this into your new file. (TIPP: Some code editors/IDEs let you create templates.)
+
+    local cm = require(ENGINE_PATH)
+    local scene = {}
+
+    function scene.onLoad()
+        --initialize your scene here
+    end
+
+    function scene.onUpdate()
+        --update your scene here.
+    end
+
+    function scene.onStop()
+        --define what is going to happen when your scene stops
+    end
+
+    return scene
+
+If you have worked with love before these function might seem familiar. Like the love functions (e.g. love.load()) these are callbacks for your scenes.
+We can put code in there, to tell our scene what to do at a specific time and state. What is different however is, that these callbacks are all coroutines.
+A later chapter might explain this in greater detail for now, just keep in mind that, unlike love's callbacks, you might pause and resume cinemotion callbacks at will.
+
+Go into the "scene.onLoad" function add add the following lines.
+
+        local layer = cm.layer.new()
+        local font = cm.sourceFont.new()
+        local text = cm.sprite.new(100,100,font,"Hello World")
+
+        layer:addSprite(text)
+
+Run the engine, navigate to run scene and run "helloworld"
 
