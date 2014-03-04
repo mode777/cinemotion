@@ -66,12 +66,12 @@ function hash.new(CellX, CellY)
         return list
     end
 
-    function i:getInRange(x,y,w,h)
+    function i:getInRange(x1,y1,x2,y2)
         local list = {}
         local minCellX, maxCellX
         local minCellY, maxCellY
-        minCellX, maxCellX = f(x/cellX),f((x+w)/cellX)
-        minCellY, maxCellY = f(y/cellY),f((y+h)/cellY)
+        minCellX, maxCellX = f(x1/cellX),f(x2/cellX)
+        minCellY, maxCellY = f(y1/cellY),f(y2/cellY)
         for y = minCellY, maxCellY do
             for x = minCellX, maxCellX do
                 if data[y] then

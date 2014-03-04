@@ -1,4 +1,4 @@
-local drawable = require(ENGINE_PATH.."/drawable")
+local drawable = require(ENGINE_PATH.."/source")
 local drawableImage = {}
 
 function drawableImage.new(path)

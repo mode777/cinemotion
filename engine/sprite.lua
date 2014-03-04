@@ -18,8 +18,8 @@ function sprite.getShowBounds()
     return showBounds
 end
 
-function sprite.new(X,Y,Drawable,Index)
-    local drawable
+function sprite.new(X,Y,Source,Index)
+    local source
     local index
     local tint
     local layer
@@ -33,17 +33,17 @@ function sprite.new(X,Y,Drawable,Index)
 
     local i = geometry.new(X,Y)
 
-    function i:setDrawable(Drawable)
-        i:setSize(Drawable:getSize(index or 1))
-        drawable = Drawable
+    function i:setSource(Source)
+        i:setSize(Source:getSize(index or 1))
+        source = Source
     end
 
-    function i:getDrawable()
-        return drawable
+    function i:getSource()
+        return source
     end
 
     function i:setIndex(Index)
-        if drawable then i:setSize(drawable:getSize(Index)) end
+        if source then i:setSize(source:getSize(Index)) end
         index = Index
     end
 
@@ -159,7 +159,7 @@ end
             love.graphics.scale(i:getSca())
             if blendmode then love.graphics.setBlendMode(blendmode) end
             if tint then setColor(unpack(tint)) end
-            if drawable then drawable:draw(index) end
+            if source then source:draw(index) end
             setColor(255,255,255,255)
             love.graphics.setBlendMode("alpha")
             love.graphics.pop()
@@ -178,7 +178,7 @@ end
         return false
     end
 
-    if Drawable then i:setDrawable(Drawable) end
+    if Source then i:setSource(Source) end
     if Index then i:setIndex(Index) end
     return i
 end

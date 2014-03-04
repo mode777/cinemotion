@@ -1,6 +1,6 @@
 local modN = "[spriteSheet]"
 local serialize = require(ENGINE_PATH.."/serialize")
-local drawableSpritesheet = require(ENGINE_PATH.."/drawableSpritesheet")
+local drawableSpritesheet = require(ENGINE_PATH.."/sourceSpritesheet")
 
 local Node = {}
 local count = 0

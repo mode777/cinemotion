@@ -162,7 +162,7 @@ function geometry.new(X,Y,W,H)
 
     if X and Y then i:movePosTo(X,Y) end
     if W and H then i:setSize(W,H) end
-
+    i:updateBBox()
     return i
 end
 

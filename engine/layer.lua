@@ -24,7 +24,8 @@ function layer.new(cellW, cellH)
 
         if cam then
             local camX, camY = cam:getPos()
-            spritelist = self:getInRange(camX*px,camY*py,screenX,screenY)
+            --print(cam:getBBox())
+            spritelist = self:getInRange(cam:getBBox())
             if cam then love.graphics.translate(-camX*px, -camY*py) end
         else
             spritelist = self:getInRange(0,0,screenX,screenY)
@@ -52,6 +53,7 @@ function layer.new(cellW, cellH)
 
     function instance:setCamera(camera)
         cam = camera
+        cam:updateBBox()
     end
 
     function instance:getCamera()
