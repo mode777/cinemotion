@@ -63,4 +63,23 @@ Go into the "scene.onLoad" function add add the following lines.
         layer:addSprite(text)
 
 Run the engine, navigate to run scene and run "helloworld"
+If you did everything right, you should see the text "Hello World" on screen.
 
+#####What happened?
+
+Let's have a closer look at our code.
+
+    local layer = cm.layer.new()
+
+First we create a new layer. cm is the local variable we loaded the cinemotion interface at the beginning of the file.
+
+If you want cinemotion to put something on screen, you have to put it into a layer first.
+If you ever worked with a picture editing programm like photoshop the concept of layers might be familiar to you.
+
+    local font = cm.sourceFont.new()
+
+Next we create a font. As we supplied no further parameters we will load löve's standart font. Fonts in cinemotion belong to a group of objects in cinemotion called sources. A source is an asset
+(which in most cases you load into the game form disk) many game objects (sprites) might share.
+The concept of sources is heavily inspired by moai framework's concepts of decks.
+A source can be a sound file, an image, a tileset, a spritesheet, a font and much more. Sources can be shared, e.g. many
+in-game sprites might share the same source.

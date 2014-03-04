@@ -40,7 +40,8 @@ function thread.update()
 	for cr,_ in pairs(threads) do
 		if status(cr) == "dead" then threads[cr] = nil
 		--resume coroutine
-		else assert(resume(cr))
+        else
+            assert(resume(cr))
 		end
 	end
 end
