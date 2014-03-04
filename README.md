@@ -9,7 +9,7 @@ Put the "engine" folder in your love project folder and edit your "main.lua" to 
     ENGINE_PATH = "engine" --change if you rename the cinemotion folder
     local engine = require(ENGINE_PATH) --local is optional here
     engine.registerCallbacks() --don't declare your own callback
-
+```
 The engine will run by the scene file "init.sce" in the root folder by default.
 This will open a rudementary menu that let's run your own scene files ot change debug settings.
 If you don't want this, you can either edit the "init.sce" or change the default scene file to load on start by editing the config.cfg file.
