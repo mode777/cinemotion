@@ -33,6 +33,7 @@ Call it "helloworld.sce" and open it. (TIPP: You can set up your favourite code 
 
 Paste this into your new file. (TIPP: Some code editors/IDEs let you create templates.)
 
+```lua
     local cm = require(ENGINE_PATH)
     local scene = {}
 
@@ -49,6 +50,7 @@ Paste this into your new file. (TIPP: Some code editors/IDEs let you create temp
     end
 
     return scene
+```
 
 If you have worked with love before these function might seem familiar. Like the love functions (e.g. love.load()) these are callbacks for your scenes.
 We can put code in there, to tell our scene what to do at a specific time and state. What is different however is, that these callbacks are all coroutines.
