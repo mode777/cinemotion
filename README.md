@@ -5,10 +5,10 @@ A modular game framework to go on top of LOVE2D
 ##Set Up
 
 Put the "engine" folder in your love project folder and edit your "main.lua" to look like this.
-
+```lua
     ENGINE_PATH = "engine" --change if you rename the cinemotion folder
     local engine = require(ENGINE_PATH) --local is optional here
-    engine.registerCallbacks() --take over love's callback functions. Declaring your own will break the engine.
+    engine.registerCallbacks() --don't declare your own callback
 
 The engine will run by the scene file "init.sce" in the root folder by default.
 This will open a rudementary menu that let's run your own scene files ot change debug settings.
