@@ -28,7 +28,6 @@ function print(...)
     oldprint(...)
 end
 
-
 engine.thread = require(ENGINE_PATH.."/thread")
 engine.serialize = require(ENGINE_PATH.."/serialize")
 engine.layer = require(ENGINE_PATH.."/layer")
@@ -58,9 +57,9 @@ end
 local function load()
     local cfg = {
     startScene = "init.sce",
-    debug = {console=true, lines=false, frames=true },
+    debug = {console=false, lines=false, frames=true },
     fullscreen = false,
-    resolution = {x=640,y=480}
+    resolution = {x=1024,y=600}
     }
     --engine.serialize.save(cfg,"engine.cfg")
     if love.keyboard.isDown("f8") then
@@ -76,7 +75,9 @@ local function load()
 end
 
 local function draw()
+    --love.graphics.scale(0.75,0.75)
     engine.layer.draw()
+    --love.graphics.scale(1,1)
     if engine.config.debug.frames then love.graphics.print(love.timer.getFPS(),10,10) end
     if engine.showConsole then
         love.graphics.setColor(255,255,255,128)

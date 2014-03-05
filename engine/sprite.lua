@@ -2,6 +2,7 @@ local z_count = 0
 
 local time = love.timer.getTime
 local setColor = love.graphics.setColor
+local setBlendMode = love.graphics.setBlendMode
 
 local thread = require (ENGINE_PATH.."/thread")
 local geometry = require(ENGINE_PATH.."/geometry")
@@ -151,23 +152,23 @@ end
         return visible
     end
 
-    function i:draw()
+    function i:draw(sx1,sy1,sx2,sy2)
         if visible then
             love.graphics.push()
             love.graphics.translate(i:getPos())
             love.graphics.rotate(i:getRot())
             love.graphics.scale(i:getSca())
-            if blendmode then love.graphics.setBlendMode(blendmode) end
+            if blendmode then setBlendMode(blendmode) end
             if tint then setColor(unpack(tint)) end
-            if source then source:draw(index) end
+            local ox1,oy1,ox2,oy2 = self:getBBox()
+            if source then source:draw(index,sx1,sy1,sx2,sy2,ox1,oy1,ox2,oy2) end
             setColor(255,255,255,255)
             love.graphics.setBlendMode("alpha")
             love.graphics.pop()
             --debug
             if showBounds then
-                local x1,y1,x2,y2 = self:getBBox()
                 local x,y = self:getPos()
-                love.graphics.rectangle("line",x1,y1,x2-x1,y2-y1)
+                love.graphics.rectangle("line",ox1,oy1,ox2-ox1,oy2-oy1)
                 love.graphics.setPointSize(5)
                 love.graphics.point(x,y)
             end

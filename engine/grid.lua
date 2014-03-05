@@ -1,23 +1,29 @@
 local grid = {}
 
-function grid.new(w,h)
-    local tw, th = w or 0, h or 0
+function grid.new(W,H)
+    local tw, th = W or 0, H or 0
     local data = {}
     local i = {}
 
     function i:clear()
         data = {}
-        for cell = 1, w*h do
+        for cell = 1, W*H do
             data[cell] = 0
         end
     end
 
     function i:setData(...)
-        data = {...}
+        data = {... }
+        if #data ~= tw*th then error("Grid data is the wrong size. Should be "..tw*th..". Is "..#data..".") end
     end
 
     function i:setCell(x,y,v)
-        data[((y-1)*(tw+1)+x)] = v
+        if x < 0 then x = x+1 end
+        if y < 0 then y = y+1 end
+        x,y = x%tw, y%tw
+        if x == 0 then x = tw end
+        if y == 0 then y = th end
+        data[((y-1)*tw)+x] = v
     end
 
     function i:setSize(w,h)
@@ -26,16 +32,24 @@ function grid.new(w,h)
 
     function i:getSize()
         return tw,th
-    end
+end
 
     function i:getCell(x,y)
-        return data[((y-1)*(tw+1))+x]
+        if x < 0 then x = x+1 end
+        if y < 0 then y = y+1 end
+        x,y = x%tw, y%th
+        if x == 0 then x = tw end
+        if y == 0 then y = th end
+        if x>tw or y>th then error("Data out of range "..x.." "..y.." "..tw.." "..th) end
+        return data[((y-1)*tw)+x]
     end
 
     function i:getData()
         return data
     end
 
+
+    if W and H then i:setSize(W,H) end
     return i
 end
 

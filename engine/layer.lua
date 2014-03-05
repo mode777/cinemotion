@@ -20,16 +20,15 @@ function layer.new(cellW, cellH)
     function instance:draw()
         love.graphics.push()
         local screenX,screenY = love.window.getWidth(), love.window.getHeight()
-        local spritelist
-
+        local sx1,sy1,sx2,sy2 = 0,0,screenX,screenY
         if cam then
+            sx1,sy1,sx2,sy2 = cam:getBBox()
             local camX, camY = cam:getPos()
             --print(cam:getBBox())
-            spritelist = self:getInRange(cam:getBBox())
             if cam then love.graphics.translate(-camX*px, -camY*py) end
-        else
-            spritelist = self:getInRange(0,0,screenX,screenY)
+            --todo parallax scrolling is probably broken
         end
+        local spritelist = self:getInRange(sx1,sy1,sx2,sy2)
 
         local drawlist = {}
         for sprite,_ in pairs(spritelist) do
@@ -42,7 +41,7 @@ function layer.new(cellW, cellH)
         end
         table.sort(drawlist,function(a,b) return a:getZIndex() < b:getZIndex() end)
         for i=1, #drawlist do
-            drawlist[i]:draw()
+            drawlist[i]:draw(sx1,sy1,sx2,sy2)
         end
         love.graphics.pop()
         for sprite,_ in pairs(lastSprites) do
