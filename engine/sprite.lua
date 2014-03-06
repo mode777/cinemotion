@@ -8,6 +8,7 @@ local floor = math.floor
 
 local thread = require (ENGINE_PATH.."/thread")
 local geometry = require(ENGINE_PATH.."/geometry")
+local event = require(ENGINE_PATH.."/event")
 
 local showBounds = false
 
@@ -28,7 +29,6 @@ function sprite.new(X,Y,Source,Index)
     local layer
     local z_index = z_count
     local animation
-    local event
     local blendmode
     local visible = true
 
@@ -37,7 +37,7 @@ function sprite.new(X,Y,Source,Index)
     local i = geometry.new(X,Y)
 
     function i:setSource(Source)
-        i:setSize(Source:getSize(index or 1))
+        i:setSize(Source:getSize(index))
         source = Source
     end
 
@@ -104,7 +104,6 @@ end
         return i:moveTint(r,g,b,a,T)
     end
 
-    --[[
     function i:setLayer(Layer, dontcall)
         layer = Layer
         if not dontcall then Layer:insert(self, true) end
@@ -113,7 +112,7 @@ end
     function i:getLayer()
         return layer
     end
-    ]]
+
 
     function i:playAnimation(Animation, Delay, Style, Dir)
         if animation then self:stopAnimation() end
@@ -136,14 +135,11 @@ end
     end
 
     function i:registerEvent(Name, Func)
-        if not event then event = {} end
-        if Func then event[Name] = Func end
+        event.register(Name,self,Func)
     end
 
-    function i:event(Name, ...)
-        if event then
-            if event[Name] then event[Name](self,...) end
-        end
+    function i:fireEvent(Name, ...)
+        event.fire(Name,self,...)
     end
 
     function i:setVisible(bool)

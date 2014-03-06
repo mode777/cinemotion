@@ -11,8 +11,8 @@ function group.new(X,Y)
     function i:addChild(Child)
         table.insert(children,Child)
         Child:setVisible(visible)
-        local hash = self:getHash()
-        if hash then hash:insertSprite(Child) end
+        local layer = self:getLayer()
+        if layer then layer:insertSprite(Child) end
     end
 
     function i:removeChild(Child)

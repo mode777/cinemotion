@@ -24,7 +24,7 @@ local menu = {
         function i:execute()
             local content = self:getChildren()
             if content[currentIndex] then
-                content[currentIndex]:event("onExecute")
+                content[currentIndex]:fireEvent("onExecute")
             end
         end
 
@@ -33,7 +33,7 @@ local menu = {
             if #content >= 1 then
                 for i,v in ipairs(content) do
                 end
-                content[currentIndex]:event("onDeselect",Dir)
+                content[currentIndex]:fireEvent("onDeselect",Dir)
                 if type(id) == "number" and content[id] then
                     currentIndex = id
                 else
@@ -41,7 +41,7 @@ local menu = {
                         if v == id then currentIndex = id end
                     end
                 end
-                content[currentIndex]:event("onSelect",Dir)
+                content[currentIndex]:fireEvent("onSelect",Dir)
             end
         end
 

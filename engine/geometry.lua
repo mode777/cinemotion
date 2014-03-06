@@ -123,14 +123,6 @@ function geometry.new(X,Y,W,H)
         return i:moveSca(SX,SY,T)
     end
 
-    function i:setHash(Hash)
-        hash = Hash
-    end
-
-    function i:getHash()
-        return hash
-    end
-
     function i:updateBBox()
         if hash then
             local ox1,oy1,ox2,oy2 = self:getBBox()

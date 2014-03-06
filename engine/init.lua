@@ -31,10 +31,10 @@ end
 engine.thread = require(ENGINE_PATH.."/thread")
 engine.serialize = require(ENGINE_PATH.."/serialize")
 engine.layer = require(ENGINE_PATH.."/layer")
-engine.layerTiles = require(ENGINE_PATH.."/layerTiles")
 engine.sourceImage = require(ENGINE_PATH.."/sourceImage")
 engine.sourceTileset = require(ENGINE_PATH.."/sourceTileset")
 engine.sourceSpritesheet = require(ENGINE_PATH.."/sourceSpritesheet")
+engine.sourcePolyline = require(ENGINE_PATH.."/sourcePolyline")
 engine.sourceFont = require(ENGINE_PATH.."/sourceFont")
 engine.spriteSheet = require(ENGINE_PATH.."/spriteSheet")
 engine.animationSheet = require(ENGINE_PATH.."/animationSheet")
@@ -46,6 +46,7 @@ engine.group = require(ENGINE_PATH.."/group")
 engine.menu = require(ENGINE_PATH.."/menu")
 engine.textinput = require(ENGINE_PATH.."/textinput")
 engine.scene = require(ENGINE_PATH.."/scene")
+engine.event = require(ENGINE_PATH.."/event")
 
 function engine.reset()
     engine.layer.clearAll()
@@ -72,6 +73,8 @@ local function load()
     engine.showConsole = engine.config.debug.console
     engine.sprite.showBounds(engine.config.debug.lines)
     engine.reset()
+    local eventThread = engine.thread.new(function() while true do engine.event.update() engine.thread.yield() end end)
+    eventThread:run()
 end
 
 local function draw()
@@ -115,5 +118,14 @@ function engine.registerCallbacks()
     love.keypressed = keypressed
     love.texinput = textinput
 end
+
+engine.event.new("onClicked",function(sprite)
+    local layer = sprite:getLayer()
+    if layer and sprite:getVisible() then
+        local x1,y1,x2,y2 = layer:toScreen(sprite:getBBox())
+        local mx,my = love.mouse.getPosition()
+        return love.mouse.isDown("l") and mx > x1 and mx < x2 and my > y1 and my < y2
+    end
+end)
 
 return engine

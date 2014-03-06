@@ -1,15 +1,17 @@
 local e = require("engine")
 local scene = {}
 
+local size = love.window.getHeight()/10
 local currentMenu
 local layer     = e.layer.new()
-local font      = e.sourceFont.new()
+local font      = e.sourceFont.new("Vera.ttf",size)
 local label     = e.sprite.new(100,100,font,"")
 
 layer:insertSprite(label)
 
 local newMenu = function(X,Y,Title)
     local parent
+    local box = e.sprite.new(0,Y-30,e.sourcePolyline.new(5))
     local m = e.menu.new()
 
     function m:activate()
@@ -17,6 +19,7 @@ local newMenu = function(X,Y,Title)
         m:setVisible(true)
         currentMenu = self
         label:setIndex(self:getTitle())
+        e.thread.wait(0.25)
     end
     function m:deactivate()
         m:setVisible(false)
@@ -24,13 +27,15 @@ local newMenu = function(X,Y,Title)
         label:setIndex("")
     end
     function m:addItem(Name, Callback)
-        local item = e.sprite.new(X,Y+15*self:getLength(),font,Name)
+        local item = e.sprite.new(X,Y+size*self:getLength(),font,Name)
         item:setTint(255,255,255,128)
         item:registerEvent("onSelect",function(self) self:setTint(255,255,255,255) end)
         item:registerEvent("onDeselect",function(self) self:setTint(255,255,255,128) end)
         item:registerEvent("onExecute",Callback)
+        item:registerEvent("onClicked",Callback)
         m:addChild(item)
         if m:getLength() == 1 then m:selectItem(1) end
+        box:setIndex({0,0,love.window.getWidth(),0})
         return item
     end
     function m:setParent(p)
@@ -41,14 +46,15 @@ local newMenu = function(X,Y,Title)
     end
     m:setTitle(Title)
     m:setVisible(false)
+    layer:insertSprite(box)
     layer:insertSprite(m)
     return m
 end
 
 function scene:onLoad()
-    local mainMenu = newMenu(100,150,"Main Menu")
-    local sceneMenu = newMenu(100,150,"Scene Menu")
-    local configMenu = newMenu(100,150,"Config Menu")
+    local mainMenu = newMenu(100,200,"Main Menu")
+    local sceneMenu = newMenu(100,200,"Scene Menu")
+    local configMenu = newMenu(100,200,"Config Menu")
 
     sceneMenu:setParent(mainMenu)
     configMenu:setParent(mainMenu)

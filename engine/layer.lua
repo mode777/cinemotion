@@ -36,7 +36,7 @@ function layer.new(cellW, cellH)
         for sprite,_ in pairs(spritelist) do
             table.insert(drawlist,sprite)
             if not lastSprites[sprite] then
-                sprite:event("onScreen")
+                sprite:fireEvent("onScreen")
             else
                 lastSprites[sprite] = nil
             end
@@ -47,7 +47,7 @@ function layer.new(cellW, cellH)
         end
         love.graphics.pop()
         for sprite,_ in pairs(lastSprites) do
-            sprite:event("offScreen")
+            sprite:fireEvent("offScreen")
         end
         lastSprites = spritelist
     end
@@ -61,16 +61,26 @@ function layer.new(cellW, cellH)
         return cam
     end
 
+    function instance:toScreen(...)
+        local data = {...}
+        local cx,cy = 0,0
+        if cam then cx,cy = cam:getBBox() end
+        for i=1, #data do
+            if i%2 == 0 then --x
+                data[i] = data[i] - cx
+            else --y
+                data[i] = data[i] - cy
+            end
+        end
+        return unpack(data)
+    end
+
     function instance:getParallax()
         return px,py
     end
 
     function instance:setParallax(x,y)
         px,py = x,y
-    end
-
-    function instance:getSprites()
-        return sprites
     end
 
     table.insert(layers,instance)

@@ -26,7 +26,7 @@ function hash.new(CellX, CellY)
             end
         end
 
-        sprite:setHash(self)
+        sprite:setLayer(self,true)
     end
 
     function i:removeSprite(sprite,x1,y1,x2,y2)
