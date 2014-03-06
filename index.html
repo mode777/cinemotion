@@ -1,0 +1,169 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Cinemotion by mode777</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Cinemotion</h1>
+        <p>A 2D Engine for the LÖVE2D framework.</p>
+        <p class="view"><a href="https://github.com/mode777/cinemotion">View the Project on GitHub <small>mode777/cinemotion</small></a></p>
+        <ul>
+          <li><a href="https://github.com/mode777/cinemotion/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/mode777/cinemotion/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/mode777/cinemotion">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a name="cinemotion" class="anchor" href="#cinemotion"><span class="octicon octicon-link"></span></a>cinemotion</h1>
+
+<h2>
+<a name="abstract" class="anchor" href="#abstract"><span class="octicon octicon-link"></span></a>Abstract</h2>
+
+<p>cinemotion is a modular framework to go on top of Löve2D. It is aimed to provide you with the tools you need to rapidly
+develop games in Löve2D by adding some functionality that love is missing. cinemotions philosophy is to enable you to
+develop Löve2D games faster and easier but also not to constrain you by forcing a single development style or object
+behaviour on you. To be more specific: cinemotion  won't provide you with a "tiled" importer but rather give you the
+tools to build one yourself with only a few lines of code. cinemotion tries to follow this strategy of giving you a few
+primitives on which you can start building your game objects.</p>
+
+<p>cinemotion will further take care of some unpleasant element of game developement you will have to take care of once
+your game gets bigger, such as:</p>
+
+<ul>
+<li>Asset management</li>
+<li>Collision detection</li>
+<li>Viewport culling</li>
+<li>Scene manegement</li>
+</ul><p>cinemotion was inspired and borrows concepts from various frameworks libraries and game engines, such as the MOAI Framework, jQuery, Construct
+and Adventure Game Studio.</p>
+
+<h2>
+<a name="set-up" class="anchor" href="#set-up"><span class="octicon octicon-link"></span></a>Set Up</h2>
+
+<p>Put the "engine" folder in your love project folder and edit your "main.lua" to look like this.</p>
+
+<div class="highlight highlight-lua"><pre>    <span class="n">ENGINE_PATH</span> <span class="o">=</span> <span class="s2">"</span><span class="s">engine"</span> <span class="c1">--change if you rename the cinemotion folder</span>
+    <span class="kd">local</span> <span class="n">engine</span> <span class="o">=</span> <span class="nb">require</span><span class="p">(</span><span class="n">ENGINE_PATH</span><span class="p">)</span> <span class="c1">--local is optional here</span>
+    <span class="n">engine</span><span class="p">.</span><span class="n">registerCallbacks</span><span class="p">()</span> <span class="c1">--don't declare your own callback</span>
+</pre></div>
+
+<p>The engine will run by the scene file "init.sce" in the root folder by default.
+This will open a rudementary menu that let's run your own scene files ot change debug settings.
+If you don't want this, you can either edit the "init.sce" or change the default scene file to load on start by editing the config.cfg file.
+On windows this will be located in "C:\users\yourname\AppData\Roaming\LOVE\yourproject". where yourname is the name you are currently logged on and yourpoject will be the identity of your game set in the "conf.lua" with "t.identity". If you downloaded the project, this will be "cinemotion".</p>
+
+<h2>
+<a name="tutorial" class="anchor" href="#tutorial"><span class="octicon octicon-link"></span></a>Tutorial</h2>
+
+<h3>
+<a name="getting-started" class="anchor" href="#getting-started"><span class="octicon octicon-link"></span></a>Getting started</h3>
+
+<p>Start the project like you would usually do with a love project (i.e. on windows: by running "love.exe foldername" or putting is into a zip file and renaming the extension to love)</p>
+
+<p>A simple menu will pop up, that let's your change your settings and run scene files. If you select "Run Scene" you will only see one entry, called "init.sce". This is the menu screen you're looking at right now.</p>
+
+<p>The first important thing to notice here is, that cinemotion organises it's game logic in scenes (you don't have to use them though).
+Think of a scene as the biggest distinguishable part of your game. It could be a level or a gui or a menu. So let's create a scene.</p>
+
+<h4>
+<a name="our-first-scene" class="anchor" href="#our-first-scene"><span class="octicon octicon-link"></span></a>Our first scene</h4>
+
+<p>Create a new file in your project root directory.
+Call it "helloworld.sce" and open it. (TIPP: You can set up your favourite code editor to treat it like a lua file, to get syntax highlighting)</p>
+
+<p>Paste this into your new file. (TIPP: Some code editors/IDEs let you create templates.)</p>
+
+<div class="highlight highlight-lua"><pre>    <span class="kd">local</span> <span class="n">cm</span> <span class="o">=</span> <span class="nb">require</span><span class="p">(</span><span class="n">ENGINE_PATH</span><span class="p">)</span>
+    <span class="kd">local</span> <span class="n">scene</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">function</span> <span class="nc">scene</span><span class="p">.</span><span class="nf">onLoad</span><span class="p">()</span>
+        <span class="c1">--initialize your scene here</span>
+    <span class="k">end</span>
+
+    <span class="k">function</span> <span class="nc">scene</span><span class="p">.</span><span class="nf">onUpdate</span><span class="p">()</span>
+        <span class="c1">--update your scene here.</span>
+    <span class="k">end</span>
+
+    <span class="k">function</span> <span class="nc">scene</span><span class="p">.</span><span class="nf">onStop</span><span class="p">()</span>
+        <span class="c1">--define what is going to happen when your scene stops</span>
+    <span class="k">end</span>
+
+    <span class="k">return</span> <span class="n">scene</span>
+</pre></div>
+
+<p>If you have worked with love before these function might seem familiar. Like the love functions (e.g. love.load()) these are callbacks for your scenes.
+We can put code in there, to tell our scene what to do at a specific time and state. What is different however is, that these callbacks are all coroutines.
+A later chapter might explain this in greater detail for now, just keep in mind that, unlike love's callbacks, you might pause and resume cinemotion callbacks at will.</p>
+
+<p>Go into the "scene.onLoad" function add add the following lines.</p>
+
+<div class="highlight highlight-lua"><pre>        <span class="kd">local</span> <span class="n">layer</span> <span class="o">=</span> <span class="n">cm</span><span class="p">.</span><span class="n">layer</span><span class="p">.</span><span class="n">new</span><span class="p">()</span>
+        <span class="kd">local</span> <span class="n">font</span> <span class="o">=</span> <span class="n">cm</span><span class="p">.</span><span class="n">sourceFont</span><span class="p">.</span><span class="n">new</span><span class="p">()</span>
+        <span class="kd">local</span> <span class="n">text</span> <span class="o">=</span> <span class="n">cm</span><span class="p">.</span><span class="n">sprite</span><span class="p">.</span><span class="n">new</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="mi">100</span><span class="p">,</span><span class="n">font</span><span class="p">,</span><span class="s2">"</span><span class="s">Hello World"</span><span class="p">)</span>
+
+        <span class="n">layer</span><span class="p">:</span><span class="n">addSprite</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</pre></div>
+
+<p>Run the engine, navigate to run scene and run "helloworld"
+If you did everything right, you should see the text "Hello World" on screen.</p>
+
+<h5>
+<a name="what-happened" class="anchor" href="#what-happened"><span class="octicon octicon-link"></span></a>What happened?</h5>
+
+<p>Let's have a closer look at our code.</p>
+
+<div class="highlight highlight-lua"><pre>    <span class="kd">local</span> <span class="n">layer</span> <span class="o">=</span> <span class="n">cm</span><span class="p">.</span><span class="n">layer</span><span class="p">.</span><span class="n">new</span><span class="p">()</span>
+</pre></div>
+
+<p>First we create a new layer. cm is the local variable we loaded the cinemotion interface at the beginning of the file.</p>
+
+<p>If you want cinemotion to put something on screen, you have to put it into a layer first.
+If you ever worked with a picture editing programm like photoshop the concept of layers might be familiar to you.</p>
+
+<div class="highlight highlight-lua"><pre>    <span class="kd">local</span> <span class="n">font</span> <span class="o">=</span> <span class="n">cm</span><span class="p">.</span><span class="n">sourceFont</span><span class="p">.</span><span class="n">new</span><span class="p">()</span>
+</pre></div>
+
+<p>Next we create a font. As we supplied no further parameters we will load löve's standart font. Fonts in cinemotion belong to a group of objects in cinemotion called sources. A source is an asset
+(which in most cases you load into the game form disk) many game objects (sprites) might share.
+The concept of sources is heavily inspired by moai framework's concepts of decks.
+A source can be a sound file, an image, a tileset, a spritesheet, a font and much more. Sources can be shared, e.g. many
+in-game sprites might share the same source.</p>
+
+<div class="highlight highlight-lua"><pre>    <span class="kd">local</span> <span class="n">text</span> <span class="o">=</span> <span class="n">cm</span><span class="p">.</span><span class="n">sprite</span><span class="p">.</span><span class="n">new</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="mi">100</span><span class="p">,</span><span class="n">font</span><span class="p">,</span><span class="s2">"</span><span class="s">Hello World"</span><span class="p">)</span>
+    <span class="n">layer</span><span class="p">:</span><span class="n">addSprite</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</pre></div>
+
+<p>Now for the actual text on screen. We create a sprite, which is an object, that gets drawn to screen. In the parameters
+ we first provide the X and Y coordinates for our sprite(100,100), provide a source (font) and provide an Index
+ ("Hello World").</p>
+
+<p>An Index is, what connects a sprite and a source. Indices may vary depending of the kind of source used. Basically the
+ index tells the engine what to do with the asset. Different sources take different indices. Fonts generally take strings,
+ Spritesheets take numerical indices or string-keys depending on how it was constructed, a tileset might take a numerical
+ index, to just draw a single tile, or a grid object to draw a whole tile layer.</p>
+
+<p>Last but not least we have to add our sprite into the layer, so the engine can draw it. Thats what the last line does.</p>
+      </section>
+    </div>
+    <footer>
+      <p>Project maintained by <a href="https://github.com/mode777">mode777</a></p>
+      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+    </footer>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
