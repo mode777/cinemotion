@@ -57,18 +57,24 @@ function scene:onLoad()
     mainMenu:addItem("Config", function() configMenu:activate() end)
     mainMenu:addItem("Exit", function() love.event.quit() end)
 
-    for _,file in ipairs(love.filesystem.getDirectoryItems(".")) do
-        local name, ext = string.match(file,"(.+).(...)")
-        if ext == "sce" then
-            sceneMenu:addItem(name, function()
-                layer:setVisible(false)
-                local sce = e.scene.new(file)
-                sce.run()
-                e.thread.waitThread(sce)
-                layer:setVisible(true)
-            end)
+    local function findScenes(Dir)
+        for _,file in ipairs(love.filesystem.getDirectoryItems(Dir)) do
+            if love.filesystem.isDirectory(Dir.."/"..file) then
+                findScenes(Dir.."/"..file)
+            end
+            local name, ext = string.match(file,"(.+).(...)")
+            if ext == "sce" then
+                sceneMenu:addItem(name, function()
+                    layer:setVisible(false)
+                    local sce = e.scene.new(Dir.."/"..file)
+                    sce.run()
+                    e.thread.waitThread(sce)
+                    layer:setVisible(true)
+                end)
+            end
         end
     end
+    findScenes("")
     mainMenu:activate()
 end
 

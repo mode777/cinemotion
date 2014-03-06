@@ -1,3 +1,5 @@
+local floor = math.floor
+
 local hash = require(ENGINE_PATH.."/hash")
 local layer = {}
 local layers = {}
@@ -25,7 +27,7 @@ function layer.new(cellW, cellH)
             sx1,sy1,sx2,sy2 = cam:getBBox()
             local camX, camY = cam:getPos()
             --print(cam:getBBox())
-            if cam then love.graphics.translate(-camX*px, -camY*py) end
+            if cam then love.graphics.translate(floor(-camX-0.5),floor(-camY-0.5)) end
             --todo parallax scrolling is probably broken
         end
         local spritelist = self:getInRange(sx1,sy1,sx2,sy2)

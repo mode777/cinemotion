@@ -41,7 +41,7 @@ function geometry.new(X,Y,W,H)
                 local t = time()
                 while T+startT > t do
                     t = time()
-                    local nx,ny = f(i:tween(t-startT, oldx, X, T,style)+0.5), f(i:tween(t-startT, oldy, Y, T,style)+0.5)
+                    local nx,ny = i:tween(t-startT, oldx, X, T,style), i:tween(t-startT, oldy, Y, T,style)
                     if nx~=x or ny~=y then
                         x,y = nx, ny
                         self:updateBBox()

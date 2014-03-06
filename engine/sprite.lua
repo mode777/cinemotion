@@ -1,8 +1,10 @@
+
 local z_count = 0
 
 local time = love.timer.getTime
 local setColor = love.graphics.setColor
 local setBlendMode = love.graphics.setBlendMode
+local floor = math.floor
 
 local thread = require (ENGINE_PATH.."/thread")
 local geometry = require(ENGINE_PATH.."/geometry")
@@ -155,7 +157,8 @@ end
     function i:draw(sx1,sy1,sx2,sy2)
         if visible then
             love.graphics.push()
-            love.graphics.translate(i:getPos())
+            local x,y = i:getPos()
+            love.graphics.translate(floor(x+0.5),floor(y+0.5))
             love.graphics.rotate(i:getRot())
             love.graphics.scale(i:getSca())
             if blendmode then setBlendMode(blendmode) end

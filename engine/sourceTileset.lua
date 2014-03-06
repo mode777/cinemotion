@@ -2,6 +2,8 @@ local modN = "[drawableTileset]"
 local drawable = require(ENGINE_PATH.."/source")
 local grid = require(ENGINE_PATH.."/grid")
 local drawq = love.graphics.draw
+local min = math.min
+local abs = math.abs
 local drawableTileset = {}
 
 function drawableTileset.new(path, Tilewidth, Tileheight)
@@ -36,6 +38,7 @@ function drawableTileset.new(path, Tilewidth, Tileheight)
 
     local function updateSpriteBatch(Grid,sx1,sy1,sx2,sy2,ox1,oy1,ox2,oy2)
         local batch = batches[Grid]
+        local mapX, mapY = Grid:getSize()
         --normalize screen rectangle, make upper right corner of object always 0,0
         --sx1,sy1 = ox1-sx1, oy1-sy1
         --todo what happens if screen rectangle is not entirely inside object rectangle??
@@ -49,9 +52,8 @@ function drawableTileset.new(path, Tilewidth, Tileheight)
         batch.batch:bind()
         local batchX,batchY = batch.grid:getSize()
 
-        for y = offsetY, offsetY+batchY-1 do
-
-            for x = offsetX, offsetX+batchX-1 do
+        for y = offsetY, min(offsetY+batchY-1,mapY-1) do
+            for x = offsetX, min(offsetX+batchX-1,mapX-1) do
                 local quadid = Grid:getCell(x+1,y+1) --or 0
                 --print(quadid)
                 if x<0 or y<0 then quadid = 0 end
@@ -61,16 +63,16 @@ function drawableTileset.new(path, Tilewidth, Tileheight)
                 end
                 --four cases
                 if ((deltaOffsetY >= 0 and deltaOffsetX >= 0) and (x > batchX-deltaOffsetX or y > batchY-deltaOffsetY)) -- 1,1
-                or ((deltaOffsetY <= 0 and deltaOffsetX <= 0) and (x < math.abs(deltaOffsetX) or y < math.abs(deltaOffsetY))) -- -1,-1
-                or ((deltaOffsetY >= 0 and deltaOffsetX <= 0) and (x > batchX-deltaOffsetX or y < math.abs(deltaOffsetY))) -- 1,-1
-                or ((deltaOffsetY <= 0 and deltaOffsetX >= 0) and (x < math.abs(deltaOffsetX) or y > batchY-deltaOffsetY)) -- -1,1
+                or ((deltaOffsetY <= 0 and deltaOffsetX <= 0) and (x < abs(deltaOffsetX) or y < abs(deltaOffsetY))) -- -1,-1
+                or ((deltaOffsetY >= 0 and deltaOffsetX <= 0) and (x > batchX-deltaOffsetX or y < abs(deltaOffsetY))) -- 1,-1
+                or ((deltaOffsetY <= 0 and deltaOffsetX >= 0) and (x < abs(deltaOffsetX) or y > batchY-deltaOffsetY)) -- -1,1
                 then
                     if quadid ~= 0 then
                         --print("Adding new quads",batch.grid:getCell(x+1,y+1),i:getQuad(quadid),x,y)
                         batch.batch:set(batch.grid:getCell(x+1,y+1),i:getQuad(quadid),x*tileWidth,y*tileHeight)
                     else
                         --print("Adding empty quads",batch.grid:getCell(x+1,y+1),x,y)
-                        batch.batch:set(batch.grid:getCell(x,y),0,0,0,0,0) --add an empty quad
+                        batch.batch:set(batch.grid:getCell(x+1,y+1),0,0,0,0,0) --add an empty quad
                     end
                 end
             end
