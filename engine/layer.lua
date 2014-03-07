@@ -10,6 +10,7 @@ function layer.new(cellW, cellH)
     local instance = hash.new(cellW,cellH)
     local lastSprites = {}
     local visible = true
+    local x1,y1,x2,y2
 
     function instance:setVisible(bool)
         visible = bool
@@ -41,10 +42,12 @@ function layer.new(cellW, cellH)
                 lastSprites[sprite] = nil
             end
         end
+        if x1 then love.graphics.setScissor(x1,y1,x2-x1,y2-y1) end --limit viewport
         table.sort(drawlist,function(a,b) return a:getZIndex() < b:getZIndex() end)
         for i=1, #drawlist do
             drawlist[i]:draw(sx1,sy1,sx2,sy2)
         end
+        if x1 then love.graphics.setScissor() end
         love.graphics.pop()
         for sprite,_ in pairs(lastSprites) do
             sprite:fireEvent("offScreen")
@@ -59,6 +62,10 @@ function layer.new(cellW, cellH)
 
     function instance:getCamera()
         return cam
+    end
+
+    function instance:setViewport(X1,Y1,X2,Y2)
+       x1,y1,x2,y2 = X1,Y1,X2,Y2
     end
 
     function instance:toScreen(...)

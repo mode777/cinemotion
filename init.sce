@@ -7,7 +7,6 @@ local layer     = e.layer.new()
 local font      = e.sourceFont.new("Vera.ttf",size)
 local label     = e.sprite.new(100,100,font,"")
 
-layer:insertSprite(label)
 
 local newMenu = function(X,Y,Title)
     local parent
@@ -38,13 +37,13 @@ local newMenu = function(X,Y,Title)
         if m:getLength() == 1 then m:selectItem(1) end
         box:setIndex({0,0,love.window.getWidth(),0})
         return item
-    end
+end
     function m:setParent(p)
         parent = p
     end
     function m:getParent()
         return parent
-    end
+end
     m:setTitle(Title)
     m:setVisible(false)
     layer:insertSprite(box)
@@ -53,6 +52,16 @@ local newMenu = function(X,Y,Title)
 end
 
 function scene:onLoad()
+    local backButton = e.sprite.new(0,0,font,"<--")
+    layer:insertSprite(backButton)
+    backButton:registerEvent("onClicked",function(self)
+        local p = currentMenu:getParent()
+        if p then p:activate() end
+        e.thread.wait(0.25)
+    end)
+
+    layer:insertSprite(label)
+
     local mainMenu = newMenu(100,200,"Main Menu")
     local sceneMenu = newMenu(100,200,"Scene Menu")
     local configMenu = newMenu(100,200,"Config Menu")
