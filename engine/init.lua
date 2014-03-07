@@ -7,6 +7,7 @@ engine.showFrames = false
 
 local oldprint = print
 local printstack = {}
+local eventQueue = {}
 
 function print(...)
     if engine.showConsole then
@@ -93,6 +94,7 @@ end
 
 local function update(dt)
     engine.thread.update()
+    eventQueue = {}
 end
 
 local function keypressed(key, u)
@@ -111,21 +113,68 @@ local function textinput(t)
     end
 end
 
+local function mousereleased(x,y,button)
+    eventQueue["mousereleased"] = {x,y,button}
+end
+
 function engine.registerCallbacks()
     love.load = load
     love.draw = draw
     love.update = update
     love.keypressed = keypressed
     love.texinput = textinput
+    love.mousereleased = mousereleased
+end
+
+function engine.getLoveEvent(Name)
+    if eventQueue[Name] then
+        return unpack(eventQueue[Name])
+    end
 end
 
 engine.event.new("onClicked",function(sprite)
+    local mx,my, button = engine.getLoveEvent("mousereleased")
+    if not mx then return end
     local layer = sprite:getLayer()
     if layer and sprite:getVisible() then
         local x1,y1,x2,y2 = layer:toScreen(sprite:getBBox())
-        local mx,my = love.mouse.getPosition()
-        return love.mouse.isDown("l") and mx > x1 and mx < x2 and my > y1 and my < y2
+        return button == "l" and mx > x1 and mx < x2 and my > y1 and my < y2
     end
 end)
+
+local mouseover = {}
+setmetatable(mouseover, {__mode = "k"})
+
+engine.event.new("onMouseOver", function(sprite)
+    local layer = sprite:getLayer()
+    if layer and sprite:getVisible() then
+        local x1,y1,x2,y2 = layer:toScreen(sprite:getBBox())
+        local mx, my = love.mouse.getPosition()
+        if not mouseover[sprite] and mx > x1 and mx < x2 and my > y1 and my < y2 then
+            mouseover[sprite] = true
+            return true
+        elseif not engine.event.isRegistered("onMouseOff",sprite) and mouseover[sprite] and (mx < x1 or mx > x2 or my < y1 or my > y2) then
+            mouseover[sprite] = nil
+            return false
+        end
+    end
+end)
+
+engine.event.new("onMouseOff", function(sprite)
+    local layer = sprite:getLayer()
+    if layer and sprite:getVisible() then
+        local x1,y1,x2,y2 = layer:toScreen(sprite:getBBox())
+        local mx, my = love.mouse.getPostion()
+        if mouseover[sprite] and (mx < x1 or mx > x2 or my < y1 or my > y2) then
+            mouseover[sprite] = nil
+            return true
+        elseif not engine.event.isRegistered("onMouseOver",sprite) and not mouseover[sprite] and mx > x1 and mx < x2 and my > y1 and my < y2 then
+            mouseover[sprite] = true
+            return false
+        end
+    end
+end)
+
+
 
 return engine

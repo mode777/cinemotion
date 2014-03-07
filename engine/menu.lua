@@ -38,9 +38,11 @@ local menu = {
                     currentIndex = id
                 else
                     for i,v in ipairs(content) do
-                        if v == id then currentIndex = id end
+                        if v == id then currentIndex = i end
                     end
                 end
+
+                if not content[currentIndex] then error(tostring(id).." is not part of this menu") end
                 content[currentIndex]:fireEvent("onSelect",Dir)
             end
         end

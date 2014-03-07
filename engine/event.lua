@@ -13,6 +13,9 @@ function event.register(Name,Sprite,Callback)
     if not events[Name] then events[Name] = event.new(Name) end
     events[Name]:register(Sprite,Callback)
 end
+function event.isRegistered(Name,Sprite)
+    if events[Name] then return events[Name]:isRegistered(Sprite) end
+end
 function event.fire(Name,Sprite,...)
     if events[Name] then events[Name]:fire(Sprite,...) end
 end
@@ -29,6 +32,9 @@ function event.new(Name , Condition)
     local i = {}
     function i:register(Sprite, Callback)
         registeredSprites[Sprite] = Callback
+    end
+    function i:isRegistered(Sprite)
+        return registeredSprites[Sprite]
     end
     function i:setCondition(Condition)
         condition = Condition
