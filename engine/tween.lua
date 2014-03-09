@@ -47,6 +47,7 @@ function tween.new()
         elseif style == "easeout" then return ease_out(t,b,c,d)
         elseif style == "easeinout" then return ease_in_out(t,b,c,d)
         elseif style == "easeinoutelastic" then return ease_in_out_elastic(t,b,c,d)
+        else error("There is no tween style such as "..tostring(style))
         end
     end
 

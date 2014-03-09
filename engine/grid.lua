@@ -32,7 +32,15 @@ function grid.new(W,H)
 
     function i:getSize()
         return tw,th
-end
+    end
+
+    function i:getHeight()
+        return th
+    end
+
+    function i:getWidth()
+        return tw
+    end
 
     function i:getCell(x,y)
         if x < 0 then x = x+1 end

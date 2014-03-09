@@ -37,10 +37,11 @@ engine.sourceTileset = require(ENGINE_PATH.."/sourceTileset")
 engine.sourceSpritesheet = require(ENGINE_PATH.."/sourceSpritesheet")
 engine.sourcePolyline = require(ENGINE_PATH.."/sourcePolyline")
 engine.sourceFont = require(ENGINE_PATH.."/sourceFont")
+engine.sourceRectangle = require(ENGINE_PATH.."/sourceRectangle")
 engine.spriteSheet = require(ENGINE_PATH.."/spriteSheet")
 engine.animationSheet = require(ENGINE_PATH.."/animationSheet")
 engine.grid = require(ENGINE_PATH.."/grid")
-engine.geometry = require(ENGINE_PATH.."/geometry")
+--engine.geometry = require(ENGINE_PATH.."/geometry")
 engine.camera = require(ENGINE_PATH.."/camera")
 engine.sprite = require(ENGINE_PATH.."/sprite")
 engine.group = require(ENGINE_PATH.."/group")
@@ -174,7 +175,5 @@ engine.event.new("onMouseOff", function(sprite)
         end
     end
 end)
-
-
 
 return engine

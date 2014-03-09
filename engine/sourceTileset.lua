@@ -105,7 +105,6 @@ function drawableTileset.new(path, Tilewidth, Tileheight)
             end
         else
             local img = i:getImage()
-            if tileWidth then return tileWidth, tileHeight end
             if img then return img:getWidth(), img:getHeight() end
         end
     end

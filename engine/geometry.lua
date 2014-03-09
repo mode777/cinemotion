@@ -80,7 +80,10 @@ function geometry.new(X,Y,W,H)
         end
         return movRot
     end
-
+    function i:moveRotTo(Rot,T)
+        Rot = Rot - rot
+        self:moveRot(Rot,T)
+    end
     function i:setRot(Rot)
         rot = Rot
     end

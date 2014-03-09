@@ -23,6 +23,7 @@ function sprite.getShowBounds()
 end
 
 function sprite.new(X,Y,Source,Index)
+    --print("sprite:",X,Y,Source,Index)
     local source
     local index
     local tint
@@ -37,7 +38,7 @@ function sprite.new(X,Y,Source,Index)
     local i = geometry.new(X,Y)
 
     function i:setSource(Source)
-        i:setSize(Source:getSize(index))
+        if index then i:setSize(Source:getSize(index)) end
         source = Source
     end
 
