@@ -100,6 +100,8 @@ end
 
 local function keypressed(key, u)
     if key == "t" then print("Active threads:", engine.thread.active()) end
+    if key == "f5" then engine.reset() end
+    if key == "l" then print("Current layers:", engine.layer.amount()) end
     if not engine.textinput.isFinished() then
         if key == "right" then engine.textinput.moveIndex(key) end
         if key == "left" then engine.textinput.moveIndex(key) end

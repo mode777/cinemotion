@@ -2,7 +2,7 @@ local cm = require(ENGINE_PATH)
 local scene = {}
 
 local layer = cm.layer.new()
-function scene.onLoad()
+function scene:onLoad()
     local posx,posy = 215,170
     local size = 16
     local sourceLogo = cm.sourceTileset.new("examples/logo/logo.png", size,size)
@@ -30,14 +30,13 @@ function scene.onLoad()
             sprites[grid:getCell(x,y)]:moveRotTo(0,4)
         end
     end
+    cm.thread.wait(6)
+    self:stop()
     --initialize your scene here
 end
 
-function scene.onUpdate()
-    --update your scene here.
-end
-
-function scene.onStop()
+function scene:onStop()
+    cm.layer.remove(layer)
     --define what is going to happen when your scene stops
 end
 

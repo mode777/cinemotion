@@ -110,6 +110,10 @@ function layer.clearAll()
     layers = {}
 end
 
+function layer.amount()
+    return #layers
+end
+
 function layer.remove(layer)
     for i=1, #layers do
         if layers[i] == layer then
