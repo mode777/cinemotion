@@ -132,7 +132,7 @@ function geometry.new(X,Y,W,H)
             local ox1,oy1,ox2,oy2 = self:getBBox()
             hash:updateSprite(self,ox1,oy1,ox2,oy2,x-pivx,y-pivy,x+w-pivx,y+h-pivy)
         end
-        bbox = {x-pivx,y-pivy,x+w-pivx,y+h-pivy}
+        bbox = {f(x-pivx),f(y-pivy),f(x+w-pivx),f(y+h-pivy)}
     end
 
     function i:getBBox()

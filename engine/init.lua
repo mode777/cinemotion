@@ -59,10 +59,10 @@ end
 
 local function load()
     local cfg = {
-    startScene = "examples/logo/logo.sce",
-    debug = {console=false, lines=false, frames=true },
-    fullscreen = false,
-    resolution = {x=1024,y=600}
+		startScene = "examples/logo/logo.sce",
+		debug = {console=false, lines=false, frames=true },
+		fullscreen = false,
+		resolution = {x=1024,y=600}
     }
     --engine.serialize.save(cfg,"engine.cfg")
     if love.keyboard.isDown("f8") then

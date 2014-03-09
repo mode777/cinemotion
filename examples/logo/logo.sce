@@ -15,7 +15,7 @@ function scene:onLoad()
     local sprites={}
     for i=1, iw*ih do
         local s = cm.sprite.new(math.random(love.window.getWidth()),math.random(love.window.getHeight()),sourceLogo,i)
-        s:moveRot(math.random(30)/10)
+        s:moveRot(-3+math.random(30)/10)
         s:moveScaTo(0.5+math.random(30)/10)
         table.insert(sprites,s)
         layer:insertSprite(s)
@@ -23,7 +23,7 @@ function scene:onLoad()
     --local fade = layer:insertSprite(cm.sprite.new(0,0,cm.sourceRectangle.new(),{love.window.getWidth(),love.window.getHeight()}))
     --fade:setTweenStyle("easein")
     --fade:moveTintTo(255,255,255,0,2)
-    cm.thread.wait(0.5)
+    while true do
     for y = 1, grid:getHeight() do
         for x = 1, grid:getWidth() do
             sprites[grid:getCell(x,y)]:setTweenStyle("easeinout")
@@ -33,6 +33,13 @@ function scene:onLoad()
         end
     end
     cm.thread.wait(1.5)
+    for i=1, iw*ih do
+        sprites[i]:movePosTo(math.random(love.window.getWidth()),math.random(love.window.getHeight()),1)
+        sprites[i]:moveRotTo(-3+math.random(30)/10,1)
+        sprites[i]:moveScaTo(0.5+math.random(30)/10,1)
+    end
+    cm.thread.wait(1.5)
+    end
     self:stop()
     --initialize your scene here
 end
