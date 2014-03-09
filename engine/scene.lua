@@ -13,7 +13,7 @@ function class.new(file)
     local i = thread.new()
 
     function i:loadFile(file)
-        local sce = serialize.load(file)
+        local sce = love.filesystem.load(file)()
         filename = file
         func = function()
             if sce.onLoad then sce.onLoad(self) end

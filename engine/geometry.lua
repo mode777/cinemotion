@@ -122,6 +122,7 @@ function geometry.new(X,Y,W,H)
     end
 
     function i:moveScaTo(SX,SY,T)
+        SY = SY or SX
         SX,SY = SX-scax, SY-scay
         return i:moveSca(SX,SY,T)
     end

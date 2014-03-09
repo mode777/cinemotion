@@ -38,11 +38,15 @@ function thread.update()
 	local delete = {}
 	--restart all threads
 	for cr,_ in pairs(threads) do
-		if status(cr) == "dead" then threads[cr] = nil
+		local state = status(cr)
+        if state == "running" then error("Unfinished coroutine caught")
+        elseif state == "dead" then threads[cr] = nil
 		--resume coroutine
-        else
+        elseif state == "suspended" then
             assert(resume(cr))
-		end
+
+        end
+
 	end
 end
 
