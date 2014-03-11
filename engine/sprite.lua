@@ -1,4 +1,3 @@
-
 local z_count = 0
 
 local time = love.timer.getTime
@@ -32,6 +31,7 @@ function sprite.new(X,Y,Source,Index)
     local animation
     local blendmode
     local visible = true
+    local tweenStyle
 
     z_count = z_count+1
 
@@ -177,6 +177,14 @@ end
 
     function i:isGroup()
         return false
+    end
+
+    function i:getTweenStyle()
+        return tweenStyle or "linear"
+    end
+
+    function i:setTweenStyle(Style)
+        tweenStyle = Style
     end
 
     if Source then i:setSource(Source) end

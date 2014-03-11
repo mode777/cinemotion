@@ -34,8 +34,8 @@ function geometry.new(X,Y,W,H)
             x,y = x+X, y+Y
             self:updateBBox()
         else
-            local tw = tween.new({x,y},{x+X,y+Y},T,function(X,Y) x,y = X,Y self:updateBBox() end)
-            return tw
+            local moveTween = tween.new({x,y},{x+X,y+Y},T,function(X,Y) x,y = X,Y self:updateBBox() end)
+            return moveTween
         end
     end
 
@@ -50,18 +50,9 @@ function geometry.new(X,Y,W,H)
         if not T then
             rot = rot+Rot
         else
-            movRot = thread.new(function()
-                local startT = time()
-                local oldrot = rot
-                local style = self:getTweenStyle()
-                while T+startT > time() do
-                    rot = i:tween(time()-startT, oldrot, Rot, T,style)
-                    thread.yield()
-                end
-            end)
-            movRot:run()
+            local movRot = tween.new({rot},{rot+Rot},T,function(Rot) rot = Rot end)
+            return movRot
         end
-        return movRot
     end
     function i:moveRotTo(Rot,T)
         Rot = Rot - rot
@@ -82,18 +73,9 @@ function geometry.new(X,Y,W,H)
         if not T then
             scax,scay = scax+SX, scay+SY
         else
-            movSca = thread.new(function()
-                local style = self:getTweenStyle()
-                local startT = time()
-                local oldx, oldy = scax,scay
-                while T+startT > time() do
-                    scax,scay = i:tween(time()-startT, oldx, SX, T,style), i:tween(time()-startT, oldy, SY, T,style)
-                    thread.yield()
-                end
-            end)
-            movSca:run()
+            local movSca = tween.new({scax,scay},{scax+SX,scay+SY},T,function(SX,SY) scax,scay = SX,SY end)
+            return movSca
         end
-        return movSca
     end
 
      function i:setSca(SX,SY)
