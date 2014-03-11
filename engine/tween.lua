@@ -1,64 +1,59 @@
-
-local function linear (t, b, c, d)
-    t = t/d
-    return b+c*(t)
-end
-
-local function ease_in_out(t, b, c, d)
-    t = t/d
-    local ts = t*t
-    local tc = ts*t
-    return b+c*(-2*tc + 3*ts)
-end
-
-local function ease_in(t,b,c,d)
-    t = t/d
-    local tc = t*t*t
-    return b+c*(tc)
-end
-
-local function ease_out(t,b,c,d)
-    t = t/d
-    local ts = t*t
-    local tc = ts*t
-    return b+c*(tc + -3*ts + 3*t);
-end
-
-local function ease_in_out_elastic(t,b,c,d)
-    t = t/d
-    local ts = t*t
-    local tc = ts*t
-    return b+c*(-9.4975*tc*ts + 31.4925*ts*ts + -36.79*tc + 15.595*ts + 0.2*t)
-end
-
+local tweens = {}
 local tween = {}
-function tween.new()
-    local style = Style or "linear"
-    local i = {}
--- t = current time (since start), b = start value, c = delta value, d = delta time
-    function i:tween(currentTime, startValue, endValue, endTime,style)
-        local t, b, c, d
-        t = currentTime
-        b = startValue
-        c = endValue
-        d = endTime
-        if style == "linear" then return linear(t,b,c,d)
-        elseif style == "easein"then return ease_in(t,b,c,d)
-        elseif style == "easeout" then return ease_out(t,b,c,d)
-        elseif style == "easeinout" then return ease_in_out(t,b,c,d)
-        elseif style == "easeinoutelastic" then return ease_in_out_elastic(t,b,c,d)
-        else error("There is no tween style such as "..tostring(style))
+
+local linear = love.math.newBezierCurve( 0,0,1,1 )
+
+function tween.update(dt)
+    for i = 1, #tweens do
+    if tweens[i] then
+        if tweens[i]:isFinished() then
+            table.remove(tweens,i)
+        else
+            tweens[i]:update(dt)
         end
     end
+    end
+end
 
-    function i:setTweenStyle(str)
-        style = str
+function tween.new(StartValue, EndValue, Duration, Callback, Style)
+    local style = Style or "linear"
+    local i = {}
+    local startValue
+    local currentValue
+    local endValue
+    local time = 0
+    local duration
+    local callback
+    local style
+    local finished
+-- t = current time (since start), b = start value, c = delta value, d = delta time
+    if type(StartValue) == "number" then startValue = {StartValue} else startValue = StartValue end
+    if type(EndValue) == "number" then endValue = {EndValue} else endValue = EndValue end
+    if #startValue ~= #endValue then error("amount of values has to match 1:"..#startValue.." 2:"..#endValue) end
+    currentValue = {}
+    duration = Duration
+    callback = Callback
+
+    function i:update(dt)
+        time = time + dt
+        if time >= duration then time = duration finished = true end
+        local _, mul = linear:evaluate(time/duration)
+        for ci=1, #startValue do
+            local delta = endValue[ci]-startValue[ci]
+            currentValue[ci] = startValue[ci]+(delta*mul)
+        end
+        if callback then callback(unpack(currentValue)) end
     end
 
-    function i:getTweenStyle()
-        return style
+    function i:isFinished()
+        return finished
     end
 
+    function i:kill()
+        finished = true
+    end
+
+    table.insert(tweens,i)
     return i
 end
 

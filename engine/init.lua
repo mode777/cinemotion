@@ -49,6 +49,7 @@ engine.menu = require(ENGINE_PATH.."/menu")
 engine.textinput = require(ENGINE_PATH.."/textinput")
 engine.scene = require(ENGINE_PATH.."/scene")
 engine.event = require(ENGINE_PATH.."/event")
+engine.tween = require(ENGINE_PATH.."/tween")
 
 function engine.reset()
     engine.layer.clearAll()
@@ -59,7 +60,7 @@ end
 
 local function load()
     local cfg = {
-		startScene = "init.sce",
+		startScene = "curvetest.sce",
 		debug = {console=false, lines=false, frames=true },
 		fullscreen = false,
 		resolution = {x=1024,y=600}
@@ -94,6 +95,7 @@ local function draw()
 end
 
 local function update(dt)
+    engine.tween.update(dt)
     engine.thread.update()
     eventQueue = {}
 end

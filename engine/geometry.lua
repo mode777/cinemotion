@@ -16,43 +16,26 @@ function geometry.new(X,Y,W,H)
     local pivx, pivy = 0,0
     local bbox = {0,0,0,0}
 
-    local i = tween.new()
+    local i = {}
 
     function i:setPos(X,Y)
-        --TODO: Broken!
-        --x,y = math.max(X,0),math.max(Y,0)
+        x,y = X,Y
+        self:updateBBOx()
     end
 
     function i:getPos()
         return x,y
     end
 
-    local movPos
+    local moveTween
     function i:movePos(X,Y,T)
-        if movPos then movPos:kill() end
+        if moveTween then moveTween:kill() end
         if not T then
             x,y = x+X, y+Y
             self:updateBBox()
         else
-            movPos = thread.new(function()
-                local startT = time()
-                local oldx, oldy = x,y
-                local style = self:getTweenStyle()
-                local t = time()
-                while T+startT > t do
-                    t = time()
-                    local nx,ny = i:tween(t-startT, oldx, X, T,style), i:tween(t-startT, oldy, Y, T,style)
-                    if nx~=x or ny~=y then
-                        x,y = nx, ny
-                        self:updateBBox()
-                    end
-                    thread.yield()
-                end
-                x,y = oldx+X, oldy+Y
-                self:updateBBox()
-            end)
-            movPos:run()
-            return movPos
+            local tw = tween.new({x,y},{x+X,y+Y},T,function(X,Y) x,y = X,Y self:updateBBox() end)
+            return tw
         end
     end
 
