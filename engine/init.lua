@@ -59,7 +59,7 @@ end
 
 local function load()
     local cfg = {
-		startScene = "examples/logo/logo.sce",
+		startScene = "init.sce",
 		debug = {console=false, lines=false, frames=true },
 		fullscreen = false,
 		resolution = {x=1024,y=600}

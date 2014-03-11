@@ -51,7 +51,7 @@ function drawableTileset.new(path, Tilewidth, Tileheight)
         batch.offsetX, batch.offsetY = offsetX,offsetY
         batch.batch:bind()
         local batchX,batchY = batch.grid:getSize()
-
+        
         for y = offsetY, min(offsetY+batchY-1,mapY-1) do
             for x = offsetX, min(offsetX+batchX-1,mapX-1) do
                 local quadid = Grid:getCell(x+1,y+1) --or 0
