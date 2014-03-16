@@ -1,7 +1,10 @@
-local tweens = {}
 local tween = {}
-
-local linear = love.math.newBezierCurve( 0,0,1,1 )
+local tweens = {}
+local curves = {}
+curves.easeinout = love.math.newBezierCurve( 0,0,0.5,0,0.5,1,1,1 )
+curves.easein = love.math.newBezierCurve( 0,0,0.5,0,1,1 )
+curves.easeout = love.math.newBezierCurve( 0,0,0.5,1,1,1 )
+curves.linear = love.math.newBezierCurve( 0,0,1,1 )
 
 function tween.update(dt)
     for i = 1, #tweens do
@@ -24,7 +27,6 @@ function tween.new(StartValue, EndValue, Duration, Callback, Style)
     local time = 0
     local duration
     local callback
-    local style
     local finished
 -- t = current time (since start), b = start value, c = delta value, d = delta time
     if type(StartValue) == "number" then startValue = {StartValue} else startValue = StartValue end
@@ -37,7 +39,7 @@ function tween.new(StartValue, EndValue, Duration, Callback, Style)
     function i:update(dt)
         time = time + dt
         if time >= duration then time = duration finished = true end
-        local _, mul = linear:evaluate(time/duration)
+        local _, mul = curves[style]:evaluate(time/duration)
         for ci=1, #startValue do
             local delta = endValue[ci]-startValue[ci]
             currentValue[ci] = startValue[ci]+(delta*mul)

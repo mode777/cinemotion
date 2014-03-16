@@ -7,13 +7,13 @@ function sourcePoyline.new(W)
     local lineWidth = 1
     function i:draw(index)
        setLineWidth(lineWidth)
-       if index then line(unpack(index)) end
+       if type(index) == "table" then line(unpack(index)) end
     end
     function i:setLineWidth(w)
         lineWidth = w
     end
     function i:getSize(index)
-        if not index then return 0,0 end
+        if type(index) == "number" then return 0,0 end
         local x1,y1,x2,y2
         for i=1, #index do
             if i%2 == 0 then --x

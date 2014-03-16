@@ -8,16 +8,23 @@ function hash.new(CellX, CellY)
     local i = {}
 
     function i:insertSprite(sprite,x1,y1,x2,y2)
-        if not y2 then x1,y1,x2,y2 = sprite:getBBox() end
         if not cellX then i:setCellSize(100) end
-        local minCellX, maxCellX = f(x1/cellX),f(x2/cellX)
-        local minCellY, maxCellY = f(y1/cellY),f(y2/cellY)
-
-        for cy = minCellY, maxCellY do
+        if not y2 then x1,y1,x2,y2 = sprite:getBBox() end
+        if x1 == x2 and y1 == y2 then
+            local cx,cy = f(x1/cellX),f(y1/cellX)
             if not data[cy] then data[cy] = {} end
-            for cx = minCellX, maxCellX do
-                if not data[cy][cx] then data[cy][cx] = {} end
-                data[cy][cx][sprite] = true
+            if not data[cy][cx] then data[cy][cx] = {} end
+            data[cy][cx][sprite] = true
+        else
+            local minCellX, maxCellX = f(x1/cellX),f(x2/cellX)
+            local minCellY, maxCellY = f(y1/cellY),f(y2/cellY)
+
+            for cy = minCellY, maxCellY do
+                if not data[cy] then data[cy] = {} end
+                for cx = minCellX, maxCellX do
+                    if not data[cy][cx] then data[cy][cx] = {} end
+                    data[cy][cx][sprite] = true
+                end
             end
         end
         if sprite:isGroup() then
@@ -32,9 +39,14 @@ function hash.new(CellX, CellY)
 
     function i:removeSprite(sprite,x1,y1,x2,y2)
         if not y2 then x1,y1,x2,y2 = sprite:getBBox() end
-        for cy = f(y1/cellY), f(y2/cellY) do
-            for cx = f(x1/cellX), f(x2/cellX) do
-                data[cy][cx][sprite] = nil
+        if x1 == x2 and y1 == y2 then
+            local cx,cy = f(x1/cellX),f(y1/cellX)
+            data[cy][cx] [sprite] = nil
+        else
+            for cy = f(y1/cellY), f(y2/cellY) do
+                for cx = f(x1/cellX), f(x2/cellX) do
+                    data[cy][cx][sprite] = nil
+                end
             end
         end
         if sprite:isGroup() then
@@ -42,7 +54,7 @@ function hash.new(CellX, CellY)
                 self:removeSprite(child)
             end
         end
-        sprite:setHash(nil)
+        sprite:setLayer(nil)
     end
 
     function i:updateSprite(sprite,x1,y1,x2,y2,x3,y3,x4,y4)

@@ -5,7 +5,7 @@ local setColor = love.graphics.setColor
 local setBlendMode = love.graphics.setBlendMode
 local floor = math.floor
 
-local thread = require (ENGINE_PATH.."/thread")
+local tween = require (ENGINE_PATH.."/tween")
 local geometry = require(ENGINE_PATH.."/geometry")
 local event = require(ENGINE_PATH.."/event")
 
@@ -31,7 +31,6 @@ function sprite.new(X,Y,Source,Index)
     local animation
     local blendmode
     local visible = true
-    local tweenStyle
 
     z_count = z_count+1
 
@@ -71,32 +70,33 @@ function sprite.new(X,Y,Source,Index)
         return unpack(tint)
 end
 
-    local movTint
 
     function i:setTint(r,g,b,a)
         if movTint then movTint:kill() end
         tint = {r or 255,g or 255, b or 255, a or 255}
     end
 
+    local tintTween
     function i:moveTint(r,g,b,a,T)
         if movTint then movTint:kill() end
         if not tint then i:setTint(255,255,255,255) end
-        T = T or 0
-        movTint = thread.new(function()
+        if not T then
+            tint = {tint[1]+r, tint[2]+g, tint[3]+b, tint[4]+a }
+        else
             local style = self:getTweenStyle()
-            local startT = time()
-            local oldr, oldg, oldb, olda = unpack(tint)
-            ---print(r,g,b,a)
-            while T+startT > time() do
-                tint[1] = i:tween(time()-startT, oldr, r, T,style)
-                tint[2] = i:tween(time()-startT, oldg, g, T,style)
-                tint[3] = i:tween(time()-startT, oldb, b, T,style)
-                tint[4] = i:tween(time()-startT, olda, a, T,style)
-                thread.yield()
-            end
-        end)
-        movTint:run()
-        return movTint
+            tintTween = tween.new(
+                tint,
+                {tint[1]+r, tint[2]+g, tint[3]+b, tint[4]+a },
+                T,
+                function(r,g,b,a)
+                    tint[1] = r
+                    tint[2] = g
+                    tint[3] = b
+                    tint[4] = a
+                end,
+                style)
+            return tintTween
+        end
     end
 
     function i:moveTintTo(r,g,b,a,T)
@@ -104,16 +104,6 @@ end
         r,g,b,a = r-tint[1],g-tint[2],b-tint[3],a-tint[4]
         return i:moveTint(r,g,b,a,T)
     end
-
-    function i:setLayer(Layer, dontcall)
-        layer = Layer
-        if not dontcall then Layer:insert(self, true) end
-    end
-
-    function i:getLayer()
-        return layer
-    end
-
 
     function i:playAnimation(Animation, Delay, Style, Dir)
         if animation then self:stopAnimation() end
@@ -155,9 +145,11 @@ end
         if visible then
             love.graphics.push()
             local x,y = i:getPos()
+            local pivx,pivy = i:getPiv()
             love.graphics.translate(floor(x+0.5),floor(y+0.5))
             love.graphics.rotate(i:getRot())
             love.graphics.scale(i:getSca())
+            love.graphics.translate(-floor(pivx+0.5),-floor(pivy+0.5))
             if blendmode then setBlendMode(blendmode) end
             if tint then setColor(unpack(tint)) end
             local ox1,oy1,ox2,oy2 = self:getBBox()
@@ -167,10 +159,16 @@ end
             love.graphics.pop()
             --debug
             if showBounds then
-                local x,y = self:getPos()
-                love.graphics.rectangle("line",ox1,oy1,ox2-ox1,oy2-oy1)
                 love.graphics.setPointSize(5)
                 love.graphics.point(x,y)
+                if self:getGeometryModel() ~= "point" then
+                    love.graphics.setLineWidth(1)
+                    love.graphics.setColor(255,0,0,255)
+                    local c1,c2,c3,c4,c5,c6,c7,c8 = self:getRectangle()
+                    love.graphics.line(c1,c2,c3,c4,c5,c6,c7,c8,c1,c2)
+                    love.graphics.setColor(255,255,255,255)
+                    love.graphics.rectangle("line",ox1,oy1,ox2-ox1,oy2-oy1)
+                end
             end
         end
     end
@@ -179,16 +177,8 @@ end
         return false
     end
 
-    function i:getTweenStyle()
-        return tweenStyle or "linear"
-    end
-
-    function i:setTweenStyle(Style)
-        tweenStyle = Style
-    end
-
     if Source then i:setSource(Source) end
-    if Index then i:setIndex(Index) end
+    if Index then i:setIndex(Index) else i:setIndex(1) end
     return i
 end
 

@@ -47,7 +47,7 @@ function event.new(Name , Condition)
         end
     end
     function i:fire(Sprite,...)
-        registeredSprites[Sprite](Sprite,...)
+        if registeredSprites[Sprite] then registeredSprites[Sprite](Sprite,...) end
     end
 
     if Condition then i:setCondition(Condition) end

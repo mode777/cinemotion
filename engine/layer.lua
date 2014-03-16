@@ -57,7 +57,7 @@ function layer.new(cellW, cellH)
 
     function instance:setCamera(camera)
         cam = camera
-        cam:updateBBox()
+        cam:updateTransformation()
     end
 
     function instance:getCamera()
