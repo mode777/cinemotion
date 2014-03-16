@@ -21,7 +21,6 @@ function scene:onLoad()
         table.insert(sprites,s)
         layer:insertSprite(s)
     end
-    cm.thread.wait(2)
     local fade = layer:insertSprite(cm.sprite.new(0,0,cm.sourceRectangle.new(),{love.window.getWidth(),love.window.getHeight()}))
     fade:setTweenStyle("easein")
     fade:moveTintTo(255,255,255,0,2)
