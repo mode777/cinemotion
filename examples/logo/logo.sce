@@ -15,7 +15,7 @@ function scene:onLoad()
     local sprites={}
     for i=1, iw*ih do
         local s = cm.sprite.new(math.random(love.window.getWidth()),math.random(love.window.getHeight()),sourceLogo,i)
-        s:setGeometryModel("point")
+        --s:setGeometryModel("point")
         s:moveRot(-3+math.random(30)/10)
         s:moveScaTo(0.5+math.random(30)/10)
         table.insert(sprites,s)

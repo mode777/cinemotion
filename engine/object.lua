@@ -1,9 +1,8 @@
 local object = {}
 function object.new()
-    local slaves = {}
-    setmetatable(slaves,{__mode="k"})
-    local masters = {}
-    setmetatable(masters,{__mode="k"})
+    local slaves
+    local masters
+
     local attrib = {}
 
     local onChanged
@@ -12,18 +11,22 @@ function object.new()
     function i:setAttribute(index, value)
         if index and value then attrib[index] = value end
         if onChanged then onChanged(self,index,value)end
-        for slave, attributes in pairs(slaves) do
-            for attribute in pairs(attributes) do
-                if attribute == index then slave:setAttribute() end
+        if slaves then
+            for slave, attributes in pairs(slaves) do
+                for attribute in pairs(attributes) do
+                    if attribute == index then slave:setAttribute() end
+                end
             end
         end
     end
 
     function i:getAttribute(index)
-        for object, attributes in pairs(masters) do
-            for attribute, func in pairs(attributes) do
-                if attribute == index then
-                    return func()
+        if masters then
+            for object, attributes in pairs(masters) do
+                for attribute, func in pairs(attributes) do
+                    if attribute == index then
+                        return func()
+                    end
                 end
             end
         end
@@ -55,6 +58,7 @@ function object.new()
     end
 
     function i:setSlaveAttribute(Slave,AttrA)
+        if not slaves then slaves = {} setmetatable(slaves,{__mode="k"}) end
         if not slaves[Slave] then slaves[Slave] = {} end
         slaves[Slave][AttrA] = true
     end
@@ -64,7 +68,8 @@ function object.new()
     end
 
     function i:setMasterAttribute(Master, AttrB, Func)
-        if not masters[Master] then masters[Master] = {} end
+        if not masters then masters = {} end
+        if not masters[Master] then masters[Master] = {} setmetatable(masters,{__mode="k"}) end
         masters[Master][AttrB] = Func
     end
 
