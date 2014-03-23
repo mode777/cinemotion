@@ -1,11 +1,11 @@
-local drawable = require(ENGINE_PATH.."/source")
+local sourceImage = require(ENGINE_PATH.."/sourceImage")
 local drawq = love.graphics.draw
 local drawableSpritesheet = {}
 
 function drawableSpritesheet.new(path)
     local quads
 
-    local i = drawable.new(path)
+    local i = sourceImage.new(path)
 
     function i:draw(index)
         index = index or 1

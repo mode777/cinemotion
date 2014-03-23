@@ -1,5 +1,6 @@
 local sourceCircle = {}
 local circle = love.graphics.circle
+local object = require(ENGINE_PATH.."/object")
 
 function sourceCircle.new(Mode)
     local i = {}

@@ -3,7 +3,7 @@ local sprite = require(ENGINE_PATH.."/sprite")
 local group = {}
 
 function group.new(X,Y)
-    local children = {}
+
     local visible = true
 
     local i = sprite.new(X,Y)

@@ -35,22 +35,23 @@ function thread.new(Func)
 end
 
 function thread.update()
-	local delete = {}
-	--restart all threads
-	for cr,_ in pairs(threads) do
-		local state = status(cr)
+    local delete = {}
+    --restart all threads
+    for cr,_ in pairs(threads) do
+        local state = status(cr)
         if state == "running" then error("Unfinished coroutine caught")
         elseif state == "dead" then threads[cr] = nil
-		--resume coroutine
+            --resume coroutine
         elseif state == "suspended" then
             assert(resume(cr))
 
         end
 
-	end
+    end
 end
 
 function thread.waitThread(cr)
+    if not cr then error("You have to provide a thread to thread.waitThread. Supplied:"..tostring(cr)) end
     while not cr:isFinished() do thread.yield() end
 end
 
@@ -59,12 +60,12 @@ function thread.waitCondition(func)
 end
 
 function thread.wait(s)
-	local t = time()
-	while time() < t+s do thread.yield() end
+    local t = time()
+    while time() < t+s do thread.yield() end
 end
 
 function thread.active()
-	local c = 0
+    local c = 0
     for _,_ in pairs(threads) do c = c+1 end
     return c
 end

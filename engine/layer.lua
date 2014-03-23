@@ -10,6 +10,7 @@ function layer.new(cellW, cellH)
     local instance = hash.new(cellW,cellH)
     local lastSprites = {}
     local visible = true
+    local active = true
     local x1,y1,x2,y2
 
     function instance:setVisible(bool)
@@ -88,6 +89,15 @@ function layer.new(cellW, cellH)
 
     function instance:setParallax(x,y)
         px,py = x,y
+    end
+
+
+    function instance:setActive(bool)
+        active = bool
+    end
+
+    function instance:getActive( )
+        return active
     end
 
     table.insert(layers,instance)

@@ -1,5 +1,5 @@
 local modN = "[drawableTileset]"
-local drawable = require(ENGINE_PATH.."/source")
+local sourceImage = require(ENGINE_PATH.."/sourceImage")
 local grid = require(ENGINE_PATH.."/grid")
 local drawq = love.graphics.draw
 local min = math.min
@@ -14,7 +14,7 @@ function drawableTileset.new(path, Tilewidth, Tileheight)
     local tileWidth, tileHeight
 
 
-    local i = drawable.new(path)
+    local i = sourceImage.new(path)
 
     local function createSpriteBatch(Grid,sx1,sy1,sx2,sy2,ox1,oy1,ox2,oy2)
         --determine if object if bigger than screen

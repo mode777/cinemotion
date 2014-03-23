@@ -1,19 +1,19 @@
 local drawableFont = {}
+local asset = require(ENGINE_PATH.."/asset")
 function drawableFont.new(path, size)
-
-    local fnt
     local i = {}
-
+    local fnt
     function i:getFont()
         return fnt
     end
 
     function i:setFont(path, size)
+        path = path or "standartFont"
         fnt = love.graphics.newFont(path, size)
+        asset.set(path,fnt)
     end
 
     function i:getSize(index, lineWidth)
-        local fnt = fnt or love.graphics.getFont()
         if index then
             local width, lines = fnt:getWrap(index, lineWidth or math.huge)
             return width, lines*fnt:getHeight()

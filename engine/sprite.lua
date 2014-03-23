@@ -35,7 +35,6 @@ function sprite.new(X,Y,Source,Index)
     z_count = z_count+1
 
     local i = geometry.new(X,Y)
-
     function i:setSource(Source)
         if index then i:setSize(Source:getSize(index)) end
         source = Source
@@ -43,7 +42,7 @@ function sprite.new(X,Y,Source,Index)
 
     function i:getSource()
         return source
-    end
+end
 
     function i:setIndex(Index)
         if source then i:setSize(source:getSize(Index)) end
@@ -52,11 +51,11 @@ function sprite.new(X,Y,Source,Index)
 
     function i:getIndex()
         return index
-    end
+end
 
     function i:getZIndex()
         return z_index
-    end
+end
 
     function i:setZIndex(z)
         z_index = z
@@ -85,38 +84,38 @@ end
         else
             local style = self:getTweenStyle()
             tintTween = tween.new(
-                tint,
+            tint,
                 {tint[1]+r, tint[2]+g, tint[3]+b, tint[4]+a },
-                T,
-                function(r,g,b,a)
-                    tint[1] = r
-                    tint[2] = g
-                    tint[3] = b
-                    tint[4] = a
-                end,
-                style)
+            T,
+            function(r,g,b,a)
+                tint[1] = r
+                tint[2] = g
+                tint[3] = b
+                tint[4] = a
+            end,
+            style)
             return tintTween
-        end
+    end
     end
 
     function i:moveTintTo(r,g,b,a,T)
         if not tint then i:setTint(255,255,255,255) end
         r,g,b,a = r-tint[1],g-tint[2],b-tint[3],a-tint[4]
         return i:moveTint(r,g,b,a,T)
-    end
+end
 
     function i:playAnimation(Animation, Delay, Style, Dir)
         if animation then self:stopAnimation() end
         animation = thread.new(function()
-        local loop = true
-                while loop do
-                    for i=1, #Animation do
-                        self:setIndex(Animation[i])
-                        thread.wait(Delay)
-                    end
-                    if Style ~= "loop" then loop = false end
+            local loop = true
+            while loop do
+                for i=1, #Animation do
+                    self:setIndex(Animation[i])
+                    thread.wait(Delay)
                 end
-            end)
+                if Style ~= "loop" then loop = false end
+            end
+        end)
 
         animation:run()
     end
@@ -126,7 +125,7 @@ end
     end
 
     function i:registerEvent(Name, Func)
-        event.register(Name,self,Func)
+        event.register(Name,Func,self)
     end
 
     function i:fireEvent(Name, ...)
@@ -135,11 +134,13 @@ end
 
     function i:setVisible(bool)
         visible = bool
+        --local children = i:getChildren() end
+
     end
 
     function i:getVisible(bool)
         return visible
-    end
+end
 
     function i:draw(sx1,sy1,sx2,sy2)
         if visible then
@@ -175,10 +176,11 @@ end
 
     function i:isGroup()
         return false
-    end
+end
 
     if Source then i:setSource(Source) end
     if Index then i:setIndex(Index) else i:setIndex(1) end
+
     return i
 end
 
