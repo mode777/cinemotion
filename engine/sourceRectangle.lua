@@ -4,7 +4,8 @@ function sourceRectangle.new(LineWidth, LineColor)
     local lineColor
     local lineWidth
     local i = {}
-    function i:draw(index)
+    function i:draw(sprite)
+        local index = sprite:getIndex()
         if index then
             love.graphics.rectangle("fill",0,0,unpack(index))
             if lineWidth then

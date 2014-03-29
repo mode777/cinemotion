@@ -7,8 +7,8 @@ function drawableSpritesheet.new(path)
 
     local i = sourceImage.new(path)
 
-    function i:draw(index)
-        index = index or 1
+    function i:draw(sprite)
+        local index = sprite:getIndex() or 1
         local img = i:getImage()
         if img then drawq(img,quads[index],0,0) end
     end

@@ -81,8 +81,10 @@ function drawableTileset.new(path, Tilewidth, Tileheight)
         return batch.batch
     end
 
-    function i:draw(index,sx1,sy1,sx2,sy2,ox1,oy1,ox2,oy2)
-        index = index or 1
+    function i:draw(sprite)
+        local index = sprite:getIndex() or 1
+        local sx1,sy1,sx2,sy2 = sprite:getLayer():getCamera():getBBox()
+        local ox1,oy1,ox2,oy2 = sprite:getBBox()
         local img = i:getImage()
         if img then
             if type(index) == "number" then --if index is a single tile

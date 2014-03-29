@@ -42,7 +42,7 @@ function sprite.new(X,Y,Source,Index)
 
     function i:getSource()
         return source
-end
+    end
 
     function i:setIndex(Index)
         if source then i:setSize(source:getSize(Index)) end
@@ -51,11 +51,11 @@ end
 
     function i:getIndex()
         return index
-end
+    end
 
     function i:getZIndex()
         return z_index
-end
+    end
 
     function i:setZIndex(z)
         z_index = z
@@ -67,8 +67,7 @@ end
 
     function i:getTint(r,g,b,a)
         return unpack(tint)
-end
-
+    end
 
     function i:setTint(r,g,b,a)
         if movTint then movTint:kill() end
@@ -77,32 +76,34 @@ end
 
     local tintTween
     function i:moveTint(r,g,b,a,T)
-        if movTint then movTint:kill() end
+        print(r,g,b,a)
+        if tintTween then tintTween:kill() end
         if not tint then i:setTint(255,255,255,255) end
         if not T then
             tint = {tint[1]+r, tint[2]+g, tint[3]+b, tint[4]+a }
         else
             local style = self:getTweenStyle()
             tintTween = tween.new(
-            tint,
-                {tint[1]+r, tint[2]+g, tint[3]+b, tint[4]+a },
-            T,
-            function(r,g,b,a)
-                tint[1] = r
-                tint[2] = g
-                tint[3] = b
-                tint[4] = a
-            end,
-            style)
+                tint,
+                {tint[1]+r, tint[2]+g, tint[3]+b, tint[4]+a},
+                T,
+                function(r,g,b,a)
+                    tint[1] = r
+                    tint[2] = g
+                    tint[3] = b
+                    tint[4] = a
+                end,
+                style
+            )
             return tintTween
-    end
+        end
     end
 
     function i:moveTintTo(r,g,b,a,T)
         if not tint then i:setTint(255,255,255,255) end
         r,g,b,a = r-tint[1],g-tint[2],b-tint[3],a-tint[4]
         return i:moveTint(r,g,b,a,T)
-end
+    end
 
     function i:playAnimation(Animation, Delay, Style, Dir)
         if animation then self:stopAnimation() end
@@ -142,7 +143,7 @@ end
         return visible
 end
 
-    function i:draw(sx1,sy1,sx2,sy2)
+    function i:draw()
         if visible then
             love.graphics.push()
             local x,y = i:getPos()
@@ -154,7 +155,7 @@ end
             if blendmode then setBlendMode(blendmode) end
             if tint then setColor(unpack(tint)) end
             local ox1,oy1,ox2,oy2 = self:getBBox()
-            if source then source:draw(index,sx1,sy1,sx2,sy2,ox1,oy1,ox2,oy2) end
+            if source then source:draw(self) end
             setColor(255,255,255,255)
             love.graphics.setBlendMode("alpha")
             love.graphics.pop()

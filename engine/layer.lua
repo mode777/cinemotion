@@ -100,6 +100,10 @@ function layer.new(cellW, cellH)
         return active
     end
 
+    function instance:getVisibleSprites()
+        return lastSprites
+    end
+
     table.insert(layers,instance)
     function instance:_created()
         print("[layer]: Layer created", instance)

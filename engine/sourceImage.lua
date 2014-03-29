@@ -5,15 +5,17 @@ function drawableImage.new(Path)
     local i = {}
     local img
 
-    function i:draw()
+    function i:draw(sprite)
         local img = i:getImage()
-        if img then love.graphics.draw(img,0,0) end
+        local iw,ih = self:getSize()
+        local sw,sh = sprite:getSize()
+
+        if img then love.graphics.draw(img,0,0,0,sw/iw,sh/ih) end
     end
 
     function i:getSize()
         local img = i:getImage()
-        print("image",img)
-        if img then print(img:getWidth(), img:getHeight()) return img:getWidth(), img:getHeight() end
+        if img then return img:getWidth(), img:getHeight() end
     end
 
     function i:getImage()

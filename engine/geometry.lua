@@ -130,9 +130,20 @@ function geometry.new(X,Y,W,H)
         self:setAttribute("piv_y",Y)
     end
 
-    function i:center()
+    function i:center(hor,ver)
+        local x, y
         local w,h = self:getSize()
-        self:movePivTo(w/2,h/2)
+        if hor == "left" then x = 0
+        elseif hor == "middle" then x = w/2
+        elseif hor == "right" then x = w
+        else x = w/2
+        end
+        if ver == "top" then y = 0
+        elseif ver == "middle" then y = h/2
+        elseif ver == "bottom" then y = h
+        else y = h/2
+        end
+        self:movePivTo(x,y)
     end
 
     local movRot
@@ -175,6 +186,7 @@ function geometry.new(X,Y,W,H)
     end
 
     function i:setSca(SX,SY)
+        SY = SY or SX
         self:setAttribute("sca_x",SX)
         self:setAttribute("sca_y",SY)
     end

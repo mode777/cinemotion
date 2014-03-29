@@ -5,7 +5,8 @@ local object = require(ENGINE_PATH.."/object")
 function sourceCircle.new(Mode)
     local i = {}
     local mode
-    function i:draw(index)
+    function i:draw(sprite)
+       local index = sprite:getIndex()
        if index then circle(mode, index,index,index) end
     end
     function i:getSize(index)

@@ -52,6 +52,7 @@ engine.textinput = require(ENGINE_PATH.."/textinput")
 engine.scene = require(ENGINE_PATH.."/scene")
 engine.event = require(ENGINE_PATH.."/event")
 engine.tween = require(ENGINE_PATH.."/tween")
+engine.data = require(ENGINE_PATH.."/data")
 
 local mouseover = {}
 setmetatable(mouseover, {__mode = "k"})
@@ -65,10 +66,13 @@ end
 
 local function load()
     local cfg = {
-		startScene = "examples/spotlight/spotlight.sce",
+		startScene = "resample.sce",
+		--startScene = "newMenu.sce",
+		--startScene = "examples/spotlight/spotlight.sce",
 		debug = {console=true, lines=false, frames=true },
 		fullscreen = false,
-		resolution = {x=640,y=480}
+		--resolution = {x=1280,y=720}
+		resolution = {x=800,y=600}
     }
     --engine.serialize.save(cfg,"engine.cfg")
     if love.keyboard.isDown("f8") then
@@ -77,12 +81,12 @@ local function load()
         engine.config = cfg--engine.serialize.load("engine.cfg")
     end
     engine.config.resolution = engine.config.resolution or {x=640,y=480}
-    love.window.setMode(engine.config.resolution.x,engine.config.resolution.y, {fullscreen = engine.config.fullscreen, vsync=false})
+    love.window.setMode(engine.config.resolution.x,engine.config.resolution.y, {fullscreen = engine.config.fullscreen, vsync=false, resizable=true})
     engine.showConsole = engine.config.debug.console
     engine.sprite.showBounds(engine.config.debug.lines)
     engine.reset()
-    --local eventThread = engine.thread.new(function() while true do engine.event.update() engine.thread.yield() end end)
-    --eventThread:run()
+    local eventThread = engine.thread.new(function() while true do engine.event.update() engine.thread.yield() end end)
+    eventThread:run()
 end
 
 local function draw()
@@ -103,7 +107,7 @@ local function update(dt)
     engine.tween.update(dt)
     engine.geometry.update()
     engine.thread.update()
-    engine.event.update()
+    --engine.event.update()
     eventQueue = {}
 end
 
