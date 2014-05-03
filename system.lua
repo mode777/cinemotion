@@ -173,5 +173,6 @@ function system.getLoveEvent(Name)
     end
 end
 
+system.registerCallbacks()
 
 return system
