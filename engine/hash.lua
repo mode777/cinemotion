@@ -2,12 +2,18 @@ local hash = {}
 function hash.new(CellX, CellY)
     local data = {}
     local cellX, cellY = CellX or 100, CellY or CellX or 100
+    local zCount = 1
     local f = math.floor
     local c = math.ceil
 
     local i = {}
 
     function i:insertSprite(sprite,x1,y1,x2,y2)
+        local z = sprite:getZIndex()
+        if z == 0 then
+            sprite:setZIndex(zCount)
+            zCount = zCount + 1
+        end
         if not cellX then i:setCellSize(100) end
         if not y2 then x1,y1,x2,y2 = sprite:getBBox() end
         if x1 == x2 and y1 == y2 then

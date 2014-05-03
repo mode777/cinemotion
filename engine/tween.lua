@@ -22,27 +22,22 @@ function tween.new(StartValue, EndValue, Duration, Callback, Style)
     local style = Style or "linear"
     local i = {}
     local startValue
-    local currentValue
+    local currentValue = {}
     local endValue
     local time = 0
     local duration
     local callback
     local finished
--- t = current time (since start), b = start value, c = delta value, d = delta time
-    if type(StartValue) == "number" then startValue = {StartValue} else startValue = StartValue end
-    if type(EndValue) == "number" then endValue = {EndValue} else endValue = EndValue end
-    if #startValue ~= #endValue then error("amount of values has to match 1:"..#startValue.." 2:"..#endValue) end
-    currentValue = {}
-    duration = Duration
-    callback = Callback
 
     function i:update(dt)
         time = time + dt
-        if time >= duration then time = duration finished = true end
-        local _, mul = curves[style]:evaluate(time/duration)
-        for ci=1, #startValue do
-            local delta = endValue[ci]-startValue[ci]
-            currentValue[ci] = startValue[ci]+(delta*mul)
+        if startValue and endValue and duration then
+            if time >= duration then time = duration finished = true end
+            local _, mul = curves[style]:evaluate(time/duration)
+            for ci=1, #startValue do
+                local delta = endValue[ci]-startValue[ci]
+                currentValue[ci] = startValue[ci]+(delta*mul)
+            end
         end
         if callback then callback(unpack(currentValue)) end
     end
@@ -54,6 +49,24 @@ function tween.new(StartValue, EndValue, Duration, Callback, Style)
     function i:kill()
         finished = true
     end
+
+    function i:setValues(StartValue,EndValue)
+        if type(StartValue) == "number" then startValue = {StartValue} else startValue = StartValue end
+        if type(EndValue) == "number" then endValue = {EndValue} else endValue = EndValue end
+        if #startValue ~= #endValue then error("amount of values has to match 1:"..#startValue.." 2:"..#endValue) end
+    end
+
+    function i:setDuration(Duration)
+        duration = Duration
+    end
+
+    function i:setCallback(Callback)
+        callback = Callback
+    end
+
+    if StartValue and EndValue then i:setValues(StartValue,EndValue) end
+    if Duration then i:setDuration(Duration) end
+    if Callback then i:setCallback(Callback) end
 
     table.insert(tweens,i)
     return i

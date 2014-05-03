@@ -1,14 +1,21 @@
 local tween = require(ENGINE_PATH.."/tween")
 local event = require(ENGINE_PATH.."/event")
+local object = require(ENGINE_PATH.."/object")
+
+local update = {}
 
 local geometry = {}
 
+local geometryUpToDate = false
+
+function geometry.update()
+    for geo, _ in pairs(update) do
+        geo:updateTransformation()
+        update[geo] = nil
+    end
+end
+
 function geometry.new(X,Y,W,H)
-    local x,y = 0,0
-    local rot = 0
-    local scax,scay = 1,1
-    local w,h = 0,0
-    local pivx, pivy = 0,0
     local lwidth
     local bbox
     local rectangle
@@ -21,108 +28,190 @@ function geometry.new(X,Y,W,H)
     local min = math.min
     local max = math.max
 
-    local i = {}
+    local i = object.new{}
 
-    function i:setPos(X,Y)
-        x,y = X,Y
-        self:updateBBOx()
+    i:setAttribute("pos_x",0)
+    i:setAttribute("pos_y",0)
+    i:setAttribute("rot",0)
+    i:setAttribute("sca_x",1)
+    i:setAttribute("sca_y",1)
+    i:setAttribute("piv_x",0)
+    i:setAttribute("piv_y",0)
+    i:setAttribute("size_x",0)
+    i:setAttribute("size_y",0)
+    i:setAttributeCallback(function(self,attr)
+        local model = self:getGeometryModel()
+        if not attr then update[self] = true end
+        if model == "full" then
+            update[self] = true
+            geometryUpToDate = false
+        elseif model == "bbox" and attr == "pos_x" or attr == "pos_y" or attr == "piv_x" or attr == "piv_y" then
+            update[self] = true
+            geometryUpToDate = false
+        elseif model == "point" and attr == "pos_x" or attr == "pos_y" then
+            update[self] = true
+            geometryUpToDate = false
+        end
+    end)
+
+    function i:setChild(Geometry)
+        self:setAttributeLink(Geometry,"pos_x",nil,function(a,b) return a+b end)
+        self:setAttributeLink(Geometry,"pos_y",nil,function(a,b) return a+b end)
+        self:setAttributeLink(Geometry,"rot",nil,function(a,b) return a+b end)
+        self:setAttributeLink(Geometry,"sca_x",nil,function(a,b) return (1+a)*b end)
+        self:setAttributeLink(Geometry,"sca_y",nil,function(a,b) return (1+a)*b end)
     end
 
-    function i:getPos()
-        return x,y
+    function i:removeChild(Geometry)
+        local x, y = Geometry:getPos()
+        local rot = Geometry:getRot()
+        local scax,scay = Geometry:getSca()
+        self:unsetAttributeLink(Geometry,"pos_x")
+        self:unsetAttributeLink(Geometry,"pos_y")
+        self:unsetAttributeLink(Geometry,"rot")
+        self:unsetAttributeLink(Geometry,"sca_x")
+        self:unsetAttributeLink(Geometry,"sca_y")
+        Geometry:setPos(x,y)
+        Geometry:setRot(rot)
+        Geometry:setSca(scax,scay)
     end
 
     local moveTween
+
+    local function setPos(X,Y)
+        i:setAttribute("pos_x",X)
+        i:setAttribute("pos_y",Y)
+    end
+
+    function i:setPos(X,Y)
+        if moveTween then moveTween:kill() end
+        setPos(X,Y)
+        --x,y = X,Y
+    end
+
+    function i:stopMoving()
+        if moveTween then moveTween:kill() end
+    end
+
+    function i:getPos()
+        return self:getAttribute("pos_x"), self:getAttribute("pos_y")
+    --return x,y
+    end
+
     function i:movePos(X,Y,T)
         if moveTween then moveTween:kill() end
         if not T then
-            x,y = x+X, y+Y
-            self:updateTransformation()
+            local x,y = self:getRawAttribute("pos_x"), self:getRawAttribute("pos_y")
+            if x then setPos(x+X, y+Y)
+            else setPos(X, Y) end
+            --x,y = x+X, y+Y
         else
-            moveTween = tween.new({x,y},{x+X,y+Y},T,function(X,Y) x,y = X,Y self:updateTransformation() end,tweenStyle)
+            local x, y = self:getRawAttribute("pos_x"), self:getRawAttribute("pos_y")
+            moveTween = tween.new({x,y},{x+X,y+Y},T,function(X,Y) setPos(X, Y) end,tweenStyle)
             return moveTween
         end
     end
 
     function i:movePosTo(X,Y,T)
-        X,Y = X-x, Y-y
+        local x,y = self:getPos()
+        if x then X,Y = X-x, Y-y end
         return i:movePos(X,Y,T)
     end
 
     local pivotTween
     function i:movePiv(X,Y,T)
         if pivotTween then pivotTween:kill() end
+        local pivx, pivy = self:getPiv()
         if not T then
-            pivx,pivy = pivx+X, pivy+Y
-            self:updateTransformation()
+            self:setPiv(pivx+X, pivy+Y)
         else
-            local pivotTween = tween.new({pivx,pivy},{pivx+X,pivy+Y},T,function(X,Y) pivx, pivy = X,Y self:updateTransformation() end,tweenStyle)
+            local pivotTween = tween.new({pivx,pivy},{pivx+X,pivy+Y},T,function(X,Y) self:setPiv(X,Y) end,tweenStyle)
             return pivotTween
         end
     end
 
     function i:movePivTo(X,Y,T)
+        local pivx, pivy = self:getPiv()
         X,Y = X-pivx,Y-pivy
         return i:movePiv(X,Y,T)
     end
 
     function i:getPiv()
-        return pivx,pivy
+        return self:getAttribute("piv_x"), self:getAttribute("piv_y")
     end
 
-    function i:center()
+    function i:setPiv(X,Y)
+        self:setAttribute("piv_x",X)
+        self:setAttribute("piv_y",Y)
+    end
+
+    function i:center(hor,ver)
+        local x, y
         local w,h = self:getSize()
-        self:movePivTo(w/2,h/2)
+        if hor == "left" then x = 0
+        elseif hor == "middle" then x = w/2
+        elseif hor == "right" then x = w
+        else x = w/2
+        end
+        if ver == "top" then y = 0
+        elseif ver == "middle" then y = h/2
+        elseif ver == "bottom" then y = h
+        else y = h/2
+        end
+        self:movePivTo(x,y)
     end
 
     local movRot
     function i:moveRot(Rot,T)
+        local rot = self:getRot()
         if movRot then movRot:kill() end
         if not T then
-            rot = rot+Rot
-            if geoModel=="full" then self:updateTransformation() end
+            self:setRot(rot+Rot)
         else
-            movRot = tween.new({rot},{rot+Rot},T,function(Rot)
-                rot = Rot
-                if geoModel=="full" then self:updateTransformation() end
-            end, tweenStyle)
+            movRot = tween.new({rot},{rot+Rot},T,function(Rot) self:setRot(Rot) end, tweenStyle)
             return movRot
         end
     end
+
     function i:moveRotTo(Rot,T)
+        local rot = self:getRot()
         Rot = Rot - rot
-        self:moveRot(Rot,T)
+        return self:moveRot(Rot,T)
     end
+
     function i:setRot(Rot)
-        rot = Rot
+        self:setAttribute("rot",Rot)
     end
 
     function i:getRot()
-        return rot
+        return self:getAttribute("rot")
     end
-    --todo : scaling is glitchy
+
     local movSca
     function i:moveSca(SX,SY,T)
         SY = SY or SX
+        local scax,scay = self:getSca()
         if movSca then movSca:kill() end
         if not T then
-            scax,scay = scax*SX, scay*SY
-            if geoModel=="full" then self:updateTransformation() end
+            self:setSca(scax*SX, scay*SY)
         else
-            movSca = tween.new({scax,scay},{scax*SX,scay*SY},T,function(SX,SY) scax,scay = SX,SY if geoModel=="full" then self:updateTransformation() end end, tweenStyle)
+            movSca = tween.new({scax,scay},{scax*SX,scay*SY},T,function(SX,SY) self:setSca(SX,SY) end, tweenStyle)
             return movSca
         end
     end
 
-     function i:setSca(SX,SY)
-         scax,scay = SX,SY
-     end
-
-    function i:getSca()
-        return scax,scay
+    function i:setSca(SX,SY)
+        SY = SY or SX
+        self:setAttribute("sca_x",SX)
+        self:setAttribute("sca_y",SY)
     end
 
+    function i:getSca()
+        return self:getAttribute("sca_x"), self:getAttribute("sca_y")
+end
+
     function i:moveScaTo(SX,SY,T)
+        local scax,scay = self:getSca()
         SY = SY or SX
         SX,SY = SX/scax, SY/scay
         return i:moveSca(SX,SY,T)
@@ -139,10 +228,15 @@ function geometry.new(X,Y,W,H)
     end
 
     function i:transformPoint(X,Y) --apply current transformation state to a given point
+        local pivx, pivy = self:getPiv()
+        local scax, scay = self:getSca()
+        local rot = self:getRot()
+        local x,y = self:getPos()
         --pivot
         X,Y = X-pivx, Y-pivy
         --scale
-        if scax ~= 1 and scay ~= 1 then X,Y = X*scax, Y*scay end
+
+        if scax ~= 1 or scay ~= 1 then X,Y = X*scax, Y*scay end
         --rotate
         if rot ~= 0 then
             local c, s = cos(rot), sin(rot)
@@ -154,6 +248,10 @@ function geometry.new(X,Y,W,H)
     end
 
     function i:projectPoint(X,Y) --project a arbitrary point to current geometry space (0,0,w,h)
+        local pivx, pivy = self:getPiv()
+        local scax, scay = self:getSca()
+        local rot = self:getRot()
+        local x,y = self:getPos()
         --transform
         X, Y = X-x, Y-y
         --rotate
@@ -162,14 +260,31 @@ function geometry.new(X,Y,W,H)
             X,Y = c*X - s*Y, s*X + c*Y
         end
         --scale
-        if scax ~= 1 and scay ~= 1 then X,Y = X/scax, Y/scay end
+        if scax ~= 1 or scay ~= 1 then X,Y = X/scax, Y/scay end
         --pivot
         X,Y = X+pivx, Y+pivy
         return X,Y
     end
 
+    function i:setSize(W,H)
+        self:setAttribute("size_x",W)
+        self:setAttribute("size_y",H)
+    end
+
+    function i:getSize()
+        return self:getAttribute("size_x"), self:getAttribute("size_y")
+    end
+
     function i:updateTransformation()
-        local ox1,oy1,ox2,oy2 = self:getBBox()
+        --todo: skip recalculating if geometry is up to date but still update hash.
+        --if geometryUpToDate then return end
+        local w,h = self:getSize()
+        local x,y = self:getPos()
+        local rot = self:getRot()
+        local scax,scay = self:getSca()
+        local pivx,pivy = self:getPiv()
+
+        local ox1,oy1,ox2,oy2 = unpack(bbox)
         local nx1,ny1,nx2,ny2
         if geoModel == "bbox" then
             nx1,ny1,nx2,ny2 = f(x-pivx),f(y-pivy),f(x+w-pivx),f(y+h-pivy)
@@ -193,14 +308,18 @@ function geometry.new(X,Y,W,H)
             end
             event.fire("onMove",self,nx1-ox1,ny1-oy1)
         end
-        bbox = {nx1,ny1,nx2,ny2}
+        bbox = {nx1,ny1,nx2,ny2 }
+        geometryUpToDate = true
     end
 
     function i:getBBox()
+        if not geometryUpToDate then i:updateTransformation() end
         return unpack(bbox)
     end
 
     function i:getRectangle()
+        if not geometryUpToDate then i:updateTransformation() end
+        local rot = self:getRot()
         if geoModel ~= "full" or rot == 0 then
             return bbox[1],bbox[2],bbox[3],bbox[2],bbox[3],bbox[4],bbox[1],bbox[4]
         else
@@ -208,13 +327,18 @@ function geometry.new(X,Y,W,H)
         end
     end
 
-    function i:setSize(W,H)
-        w,h = W,H
-        self:updateTransformation()
-    end
-
-    function i:getSize()
-        return w,h
+    function i:isInside(X,Y)
+        local w,h = self:getSize()
+        local rot = self:getRot()
+        if geoModel == "point" then
+            local x,y = self:getPos()
+            return x == X and y == Y
+        elseif geoModel == "bbox" or rot == 0 then
+            return X > bbox[1] and X < bbox[3] and Y > bbox[2] and Y < bbox[4]
+        else --full transformation
+            local X,Y = self:projectPoint(X,Y)
+            return X > 0 and X < w and Y > 0 and Y < h
+        end
     end
 
     function i:setLineWidth(W) --only in connection with text drawables
@@ -223,11 +347,11 @@ function geometry.new(X,Y,W,H)
 
     function i:getLineWidth()
         return lwidth
-    end
+end
 
     function i:getTweenStyle()
         return tweenStyle or "linear"
-    end
+end
 
     function i:setTweenStyle(Style)
         tweenStyle = Style
@@ -241,11 +365,12 @@ function geometry.new(X,Y,W,H)
 
     function i:getLayer()
         return layer
-    end
+end
 
-    bbox = {f(x-pivx),f(y-pivy),f(x+w-pivx),f(y+h-pivy) }
+    bbox = {0,0,0,0}
     if X and Y then i:movePosTo(X,Y) end
     if W and H then i:setSize(W,H) end
+
     return i
 end
 

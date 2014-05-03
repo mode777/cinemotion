@@ -1,5 +1,3 @@
-local z_count = 0
-
 local time = love.timer.getTime
 local setColor = love.graphics.setColor
 local setBlendMode = love.graphics.setBlendMode
@@ -27,18 +25,17 @@ function sprite.new(X,Y,Source,Index)
     local index
     local tint
     local layer
-    local z_index = z_count
+    local z_index = 0
     local animation
     local blendmode
     local visible = true
 
-    z_count = z_count+1
 
     local i = geometry.new(X,Y)
-
     function i:setSource(Source)
         if index then i:setSize(Source:getSize(index)) end
         source = Source
+        self:updateTransformation()
     end
 
     function i:getSource()
@@ -68,33 +65,35 @@ function sprite.new(X,Y,Source,Index)
 
     function i:getTint(r,g,b,a)
         return unpack(tint)
-end
-
-
-    function i:setTint(r,g,b,a)
-        if movTint then movTint:kill() end
-        tint = {r or 255,g or 255, b or 255, a or 255}
     end
 
     local tintTween
+    function i:setTint(r,g,b,a)
+        if tintTween then tintTween:kill() end
+        tint = {r or 255,g or 255, b or 255, a or 255}
+    end
+
     function i:moveTint(r,g,b,a,T)
-        if movTint then movTint:kill() end
+        if tintTween then tintTween:kill() end
         if not tint then i:setTint(255,255,255,255) end
         if not T then
             tint = {tint[1]+r, tint[2]+g, tint[3]+b, tint[4]+a }
         else
             local style = self:getTweenStyle()
             tintTween = tween.new(
-                tint,
-                {tint[1]+r, tint[2]+g, tint[3]+b, tint[4]+a },
+                {tint[1], tint[2], tint[3], tint[4]},
+                {tint[1]+r, tint[2]+g, tint[3]+b, tint[4]+a},
                 T,
                 function(r,g,b,a)
+                    if not i.index then
+                    end
                     tint[1] = r
                     tint[2] = g
                     tint[3] = b
                     tint[4] = a
                 end,
-                style)
+                style
+            )
             return tintTween
         end
     end
@@ -108,15 +107,15 @@ end
     function i:playAnimation(Animation, Delay, Style, Dir)
         if animation then self:stopAnimation() end
         animation = thread.new(function()
-        local loop = true
-                while loop do
-                    for i=1, #Animation do
-                        self:setIndex(Animation[i])
-                        thread.wait(Delay)
-                    end
-                    if Style ~= "loop" then loop = false end
+            local loop = true
+            while loop do
+                for i=1, #Animation do
+                    self:setIndex(Animation[i])
+                    thread.wait(Delay)
                 end
-            end)
+                if Style ~= "loop" then loop = false end
+            end
+        end)
 
         animation:run()
     end
@@ -126,7 +125,7 @@ end
     end
 
     function i:registerEvent(Name, Func)
-        event.register(Name,self,Func)
+        event.register(Name,Func,self)
     end
 
     function i:fireEvent(Name, ...)
@@ -135,13 +134,15 @@ end
 
     function i:setVisible(bool)
         visible = bool
+        --local children = i:getChildren() end
+
     end
 
     function i:getVisible(bool)
         return visible
-    end
+end
 
-    function i:draw(sx1,sy1,sx2,sy2)
+    function i:draw()
         if visible then
             love.graphics.push()
             local x,y = i:getPos()
@@ -149,11 +150,11 @@ end
             love.graphics.translate(floor(x+0.5),floor(y+0.5))
             love.graphics.rotate(i:getRot())
             love.graphics.scale(i:getSca())
-            love.graphics.translate(-floor(pivx+0.5),-floor(pivy+0.5))
+            love.graphics.translate(-pivx,-pivy)
             if blendmode then setBlendMode(blendmode) end
             if tint then setColor(unpack(tint)) end
             local ox1,oy1,ox2,oy2 = self:getBBox()
-            if source then source:draw(index,sx1,sy1,sx2,sy2,ox1,oy1,ox2,oy2) end
+            if source then source:draw(self) end
             setColor(255,255,255,255)
             love.graphics.setBlendMode("alpha")
             love.graphics.pop()
@@ -175,10 +176,11 @@ end
 
     function i:isGroup()
         return false
-    end
+end
 
     if Source then i:setSource(Source) end
     if Index then i:setIndex(Index) else i:setIndex(1) end
+    i:updateTransformation()
     return i
 end
 

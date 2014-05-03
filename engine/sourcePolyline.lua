@@ -5,8 +5,9 @@ local setLineWidth = love.graphics.setLineWidth
 function sourcePoyline.new(W)
     local i = {}
     local lineWidth = 1
-    function i:draw(index)
+    function i:draw()
        setLineWidth(lineWidth)
+       local index = sprite:getIndex()
        if type(index) == "table" then line(unpack(index)) end
     end
     function i:setLineWidth(w)

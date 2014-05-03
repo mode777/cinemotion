@@ -18,7 +18,7 @@ local newMenu = function(X,Y,Title)
         m:setVisible(true)
         currentMenu = self
         label:setIndex(self:getTitle())
-        e.thread.wait(0.25)
+        --e.thread.wait(0.25)
     end
     function m:deactivate()
         m:setVisible(false)
@@ -37,13 +37,13 @@ local newMenu = function(X,Y,Title)
         if m:getLength() == 1 then m:selectItem(1) end
         box:setIndex({0,0,love.window.getWidth(),0})
         return item
-end
+    end
     function m:setParent(p)
         parent = p
     end
     function m:getParent()
         return parent
-end
+    end
     m:setTitle(Title)
     m:setVisible(false)
     layer:insertSprite(box)
@@ -57,7 +57,6 @@ function scene:onLoad()
     backButton:registerEvent("onClicked",function(self)
         local p = currentMenu:getParent()
         if p then p:activate() end
-        e.thread.wait(0.25)
     end)
 
     layer:insertSprite(label)
@@ -81,11 +80,13 @@ function scene:onLoad()
             local name, ext = string.match(file,"(.+).(...)")
             if ext == "sce" then
                 sceneMenu:addItem(name, function()
+                    e.thread.new(function()
                     layer:setVisible(false)
                     local sce = e.scene.new(Dir.."/"..file)
                     sce.run()
                     e.thread.waitThread(sce)
                     layer:setVisible(true)
+                    end):run()
                 end)
             end
         end
