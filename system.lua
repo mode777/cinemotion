@@ -75,9 +75,9 @@ local function update(dt)
 end
 
 local function keypressed(key, u)
-    if key == "t" then print("Active threads:", engine.thread.active()) end
+    --if key == "t" then print("Active threads:", engine.thread.active()) end
     if key == "f5" then system.reset() end
-    if key == "l" then print("Current layers:", engine.layer.amount()) end
+    --if key == "l" then print("Current layers:", engine.layer.amount()) end
     if key == "b" then
         if sprite.getShowBounds() then
             sprite.showBounds(false)
@@ -177,8 +177,5 @@ function system.getLoveEvent(Name)
         return unpack(eventQueue[Name])
     end
 end
-
-system.registerCallbacks()
-
 
 return system

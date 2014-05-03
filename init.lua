@@ -27,4 +27,5 @@ engine.tween = require(ENGINE_PATH.."/tween")
 engine.data = require(ENGINE_PATH.."/data")
 engine.input = require(ENGINE_PATH.."/input")
 
+engine.registerCallbacks()
 return engine
