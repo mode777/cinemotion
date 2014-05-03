@@ -6,6 +6,8 @@ local update = {}
 
 local geometry = {}
 
+local geometryUpToDate = false
+
 function geometry.update()
     for geo, _ in pairs(update) do
         geo:updateTransformation()
@@ -42,10 +44,13 @@ function geometry.new(X,Y,W,H)
         if not attr then update[self] = true end
         if model == "full" then
             update[self] = true
+            geometryUpToDate = false
         elseif model == "bbox" and attr == "pos_x" or attr == "pos_y" or attr == "piv_x" or attr == "piv_y" then
             update[self] = true
+            geometryUpToDate = false
         elseif model == "point" and attr == "pos_x" or attr == "pos_y" then
             update[self] = true
+            geometryUpToDate = false
         end
     end)
 
@@ -71,10 +76,21 @@ function geometry.new(X,Y,W,H)
         Geometry:setSca(scax,scay)
     end
 
+    local moveTween
+
+    local function setPos(X,Y)
+        i:setAttribute("pos_x",X)
+        i:setAttribute("pos_y",Y)
+    end
+
     function i:setPos(X,Y)
-        self:setAttribute("pos_x",X)
-        self:setAttribute("pos_y",Y)
+        if moveTween then moveTween:kill() end
+        setPos(X,Y)
         --x,y = X,Y
+    end
+
+    function i:stopMoving()
+        if moveTween then moveTween:kill() end
     end
 
     function i:getPos()
@@ -82,17 +98,16 @@ function geometry.new(X,Y,W,H)
     --return x,y
     end
 
-    local moveTween
     function i:movePos(X,Y,T)
         if moveTween then moveTween:kill() end
         if not T then
-            local x,y = self:getPos()
-            if x then self:setPos(x+X, y+Y)
-            else self:setPos(X, Y) end
+            local x,y = self:getRawAttribute("pos_x"), self:getRawAttribute("pos_y")
+            if x then setPos(x+X, y+Y)
+            else setPos(X, Y) end
             --x,y = x+X, y+Y
         else
-            local x, y = self:getPos()
-            moveTween = tween.new({x,y},{x+X,y+Y},T,function(X,Y) self:setPos(X, Y) end,tweenStyle)
+            local x, y = self:getRawAttribute("pos_x"), self:getRawAttribute("pos_y")
+            moveTween = tween.new({x,y},{x+X,y+Y},T,function(X,Y) setPos(X, Y) end,tweenStyle)
             return moveTween
         end
     end
@@ -261,13 +276,15 @@ end
     end
 
     function i:updateTransformation()
+        --todo: skip recalculating if geometry is up to date but still update hash.
+        --if geometryUpToDate then return end
         local w,h = self:getSize()
         local x,y = self:getPos()
         local rot = self:getRot()
         local scax,scay = self:getSca()
         local pivx,pivy = self:getPiv()
 
-        local ox1,oy1,ox2,oy2 = self:getBBox()
+        local ox1,oy1,ox2,oy2 = unpack(bbox)
         local nx1,ny1,nx2,ny2
         if geoModel == "bbox" then
             nx1,ny1,nx2,ny2 = f(x-pivx),f(y-pivy),f(x+w-pivx),f(y+h-pivy)
@@ -291,14 +308,17 @@ end
             end
             event.fire("onMove",self,nx1-ox1,ny1-oy1)
         end
-        bbox = {nx1,ny1,nx2,ny2}
+        bbox = {nx1,ny1,nx2,ny2 }
+        geometryUpToDate = true
     end
 
     function i:getBBox()
+        if not geometryUpToDate then i:updateTransformation() end
         return unpack(bbox)
     end
 
     function i:getRectangle()
+        if not geometryUpToDate then i:updateTransformation() end
         local rot = self:getRot()
         if geoModel ~= "full" or rot == 0 then
             return bbox[1],bbox[2],bbox[3],bbox[2],bbox[3],bbox[4],bbox[1],bbox[4]

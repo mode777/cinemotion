@@ -14,6 +14,7 @@ function thread.new(Func)
         co = coroutine.create(func)
         threads[co] = true
         assert(resume(co))
+        return self
     end
     function i:isFinished()
         if co then

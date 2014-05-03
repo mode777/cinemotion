@@ -22,19 +22,22 @@ function drawableFont.new(path, size)
         end
     end
 
-    function i:getFontHeight()
+    function i:getLineHeight()
         return fnt:getHeight()
     end
 
     function i:draw(sprite)
         local text = sprite:getIndex() or ""
+        local w,_ = sprite:getSize()
         local ofnt = love.graphics.getFont()
         if fnt then love.graphics.setFont(fnt) end
-        love.graphics.print(text,0,0)
+        love.graphics.printf( text, 0, 0, w)
         love.graphics.setFont(ofnt)
     end
 
-    if path or size then i:setFont(path, size) end
+    if path or size then i:setFont(path, size) else
+        fnt = love.graphics.getFont()
+    end
     print("[drawableFont]: Font loaded",path,size,i)
     return i
 end

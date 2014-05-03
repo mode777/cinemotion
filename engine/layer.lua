@@ -1,4 +1,5 @@
 local floor = math.floor
+local zcount = 0
 
 local hash = require(ENGINE_PATH.."/hash")
 local layer = {}
@@ -7,11 +8,13 @@ local layers = {}
 function layer.new(cellW, cellH)
     local px, py = 1,1 --parallax
     local cam
-    local instance = hash.new(cellW,cellH)
+    local instance = cellW ~= "NOHASH" and hash.new(cellW,cellH) or {}
     local lastSprites = {}
     local visible = true
     local active = true
     local x1,y1,x2,y2
+    local zIndex = zcount
+    zcount = zcount + 1
 
     function instance:setVisible(bool)
         visible = bool
@@ -19,6 +22,14 @@ function layer.new(cellW, cellH)
 
     function instance:getVisible()
         return visible
+    end
+
+    function instance:setZIndex(z)
+        zIndex = z
+    end
+
+    function instance:getZIndex()
+        return zIndex
     end
 
     function instance:draw()
@@ -54,6 +65,15 @@ function layer.new(cellW, cellH)
             sprite:fireEvent("offScreen")
         end
         lastSprites = spritelist
+    end
+
+    function instance:getBBox()
+        if cam then
+            return cam:getBBox()
+        else
+            local sw,sh = love.window.getDimensions()
+            return 0,0,sw,sh
+        end
     end
 
     function instance:setCamera(camera)
@@ -105,14 +125,11 @@ function layer.new(cellW, cellH)
     end
 
     table.insert(layers,instance)
-    function instance:_created()
-        print("[layer]: Layer created", instance)
-    end
-    instance:_created()
     return instance
 end
 
 function layer.draw()
+    table.sort(layers,function(a,b) return a:getZIndex() < b:getZIndex() end)
     for i = 1, #layers do
         if layers[i]:getVisible() then
             layers[i]:draw()
@@ -134,6 +151,15 @@ function layer.remove(layer)
             table.remove(layers, i)
         end
     end
+end
+
+function layer.toBackground(Layer)
+    Layer:setZIndex(0)
+end
+
+function layer.toForeground(Layer)
+    Layer:setZIndex(zcount)
+    zcount = zcount+1
 end
 
 return layer

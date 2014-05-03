@@ -1,6 +1,7 @@
 local object = {}
 function object.new()
     local slaves
+
     local masters
 
     local attrib = {}

@@ -12,7 +12,6 @@ function sourceRectangle.new(LineWidth, LineColor)
                 if lineColor then love.graphics.setColor( unpack(lineColor) ) end
                 love.graphics.setLineWidth(lineWidth)
                 love.graphics.rectangle( "line",0,0,unpack(index) )
-                love.graphics.setColor( 255,255,255,255 )
             end
         end
     end
@@ -23,14 +22,15 @@ function sourceRectangle.new(LineWidth, LineColor)
         lineWidth = w
     end
     function i:getSize(index)
-        if type(index) ~= "table" then return error("sourceRectangle needs a table as index. Given: "..tostring(index)) end
+
+        --if type(index) ~= "table" then return error("sourceRectangle needs a table as index. Given: "..tostring(index)) end
         if index then
             return index[1],index[2]
         else
             return 0,0
         end
     end
-    if LineWidth then i:setLineWidth(LineWidth) end
+    if LineWidth then i:setLineWidth(LineWidth) else i:setLineWidth(1) end
     if LineColor then i:setLineColor(unpack(LineColor)) end
     return i
 end

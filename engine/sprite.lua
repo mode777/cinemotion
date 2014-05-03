@@ -1,5 +1,3 @@
-local z_count = 0
-
 local time = love.timer.getTime
 local setColor = love.graphics.setColor
 local setBlendMode = love.graphics.setBlendMode
@@ -27,17 +25,17 @@ function sprite.new(X,Y,Source,Index)
     local index
     local tint
     local layer
-    local z_index = z_count
+    local z_index = 0
     local animation
     local blendmode
     local visible = true
 
-    z_count = z_count+1
 
     local i = geometry.new(X,Y)
     function i:setSource(Source)
         if index then i:setSize(Source:getSize(index)) end
         source = Source
+        self:updateTransformation()
     end
 
     function i:getSource()
@@ -69,14 +67,13 @@ function sprite.new(X,Y,Source,Index)
         return unpack(tint)
     end
 
+    local tintTween
     function i:setTint(r,g,b,a)
-        if movTint then movTint:kill() end
+        if tintTween then tintTween:kill() end
         tint = {r or 255,g or 255, b or 255, a or 255}
     end
 
-    local tintTween
     function i:moveTint(r,g,b,a,T)
-        print(r,g,b,a)
         if tintTween then tintTween:kill() end
         if not tint then i:setTint(255,255,255,255) end
         if not T then
@@ -84,10 +81,12 @@ function sprite.new(X,Y,Source,Index)
         else
             local style = self:getTweenStyle()
             tintTween = tween.new(
-                tint,
+                {tint[1], tint[2], tint[3], tint[4]},
                 {tint[1]+r, tint[2]+g, tint[3]+b, tint[4]+a},
                 T,
                 function(r,g,b,a)
+                    if not i.index then
+                    end
                     tint[1] = r
                     tint[2] = g
                     tint[3] = b
@@ -151,7 +150,7 @@ end
             love.graphics.translate(floor(x+0.5),floor(y+0.5))
             love.graphics.rotate(i:getRot())
             love.graphics.scale(i:getSca())
-            love.graphics.translate(-floor(pivx+0.5),-floor(pivy+0.5))
+            love.graphics.translate(-pivx,-pivy)
             if blendmode then setBlendMode(blendmode) end
             if tint then setColor(unpack(tint)) end
             local ox1,oy1,ox2,oy2 = self:getBBox()
@@ -181,7 +180,7 @@ end
 
     if Source then i:setSource(Source) end
     if Index then i:setIndex(Index) else i:setIndex(1) end
-
+    i:updateTransformation()
     return i
 end
 
