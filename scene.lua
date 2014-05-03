@@ -1,6 +1,7 @@
 local thread = require(ENGINE_PATH.."/thread")
 local serialize = require(ENGINE_PATH.."/serialize")
 
+local scenes = {}
 --scene
 
 local class = {}
@@ -24,6 +25,7 @@ function class.new(file)
                 end
             end
             if sce.onStop then sce.onStop(self) end
+            scenes[file] = nil
         end
         i:setFunction(func)
     end
@@ -31,9 +33,20 @@ function class.new(file)
     function i:stop()
         stop = true
     end
-    if file then i:loadFile(file) end
+    if file then i:loadFile(file) scenes[file] = i end
 
     return i
+end
+
+function class.get(name)
+    return scenes[name]
+end
+
+function class.running()
+    local buffer = {}
+    for name in pairs(scenes) do
+        table.insert(buffer,name)
+    end
 end
 
 return class

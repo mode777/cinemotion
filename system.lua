@@ -37,14 +37,19 @@ function system.reset()
     layer.clearAll()
     thread.clearAll()
     thread.new(function()while true do event.update() thread.yield() end end):run()
-    local scene = scene.new(config.startScene)
-    scene:run()
+end
+
+function system.runScene(file)
+    local myScene = scene.new(file)
+    myScene:run()
+    return myScene
 end
 
 local eventQueue = {}
 
 local function load()
     system.reset()
+    system.runScene(system.startScene)
 end
 
 local function draw()
@@ -174,5 +179,6 @@ function system.getLoveEvent(Name)
 end
 
 system.registerCallbacks()
+
 
 return system
