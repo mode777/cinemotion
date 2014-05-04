@@ -77,4 +77,8 @@ end
 
 thread.yield = coroutine.yield
 
+thread._DOC={
+    waitThread={"Blocks current thread until another thread is finished.",{ {"thread","Thread","This function will also accept tweens (animations) as they have the same interface"} }},
+}
+
 return thread
