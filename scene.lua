@@ -52,7 +52,7 @@ end
 
 scene._DOC = {
     new = {
-        "Constructor for scene objects",{ {"string","filename","The scene file to load"} },{ {"scene","scene"} },
+        "Constructor for %scene% objects",{ {"string","filename","The scene file to load"} },{ {"scene","scene"} },
         INHERIT="thread",
         methods={
             loadFile={"Loads a scene",{ {"string","file","The file to load"} }},
