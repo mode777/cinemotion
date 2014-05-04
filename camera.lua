@@ -8,4 +8,11 @@ function camera.new(X,Y)
     return i
 end
 
+camera._DOC = {
+    new = {
+        "Constructor for a camera",{ {"number","Y","number","Y"} },{ {"camera","Camera"} },
+        INHERIT="geometry",
+    },
+}
+
 return camera

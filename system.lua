@@ -33,6 +33,8 @@ function print(...)
     oldprint(...)
 end
 
+local startScene
+
 function system.reset()
     layer.clearAll()
     thread.clearAll()
@@ -45,11 +47,16 @@ function system.runScene(file)
     return myScene
 end
 
+function system.setStartScene(name)
+    startScene = name
+end
+
 local eventQueue = {}
 
 local function load()
     system.reset()
-    system.runScene(system.startScene)
+    print(startScene)
+    system.runScene(startScene)
 end
 
 local function draw()

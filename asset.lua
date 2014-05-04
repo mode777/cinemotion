@@ -32,4 +32,11 @@ function asset.getAssets()
     return datas
 end
 
+asset._DOC = {
+    getData = {"Gets userdata for a filename (if loaded)",{ {"string","filename"} },{ {"userdata","data"} }},
+    getName = {"Gets filename of loaded userdata",{ {"userdata","Data"} },{ {"string","filename"} }},
+    set = {"Links an asset to a filename. Manages assets.",{ {"string","Filename"},{"userdata","Data"} }},
+    getAssets = {"Gets a list of all loaded assets.",nil, { {"table","list"} }},
+}
+
 return asset

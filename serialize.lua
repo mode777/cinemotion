@@ -41,6 +41,10 @@ function serialize.save(Table, Name)
     print("finished "..love.timer.getTime()-t)
 end
 
+function serialize.saveString(Str, Name)
+    fs.write( Name, Str )
+end
+
 function serialize.load(Name)
     if not fs.exists(Name) then return end
     return assert(assert(fs.load( Name ))())

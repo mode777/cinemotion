@@ -4,9 +4,9 @@ local serialize = require(ENGINE_PATH.."/serialize")
 local scenes = {}
 --scene
 
-local class = {}
+local scene = {}
 
-function class.new(file)
+function scene.new(file)
     local stop
     local func
     local filename
@@ -38,15 +38,29 @@ function class.new(file)
     return i
 end
 
-function class.get(name)
+function scene.get(name)
     return scenes[name]
 end
 
-function class.running()
+function scene.running()
     local buffer = {}
     for name in pairs(scenes) do
         table.insert(buffer,name)
     end
+    return buffer
 end
 
-return class
+scene._DOC = {
+    new = {
+        "Constructor for scene objects",{ {"string","filename","The scene file to load"} },{ {"scene","scene"} },
+        INHERIT="thread",
+        methods={
+            loadFile={"Loads a scene",{ {"string","file","The file to load"} }},
+            stop={"Stops the %scene% and calls the scene:onStop() callback"}
+        }
+    },
+    get = {"Get's a currently loaded scene",{ {"string","name","The filename of the loaded scene"} },{ {"scene","Scene"} }},
+    running={"Get a list of all currently running scenes",nil,{ {"table","list"} }}
+}
+
+return scene

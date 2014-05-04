@@ -1,7 +1,8 @@
 ENGINE_PATH = ENGINE_PATH or "engine"
 
-local engine = require(ENGINE_PATH.."/system")
-engine.config = require(ENGINE_PATH.."/config")
+local engine = {}
+engine.system = require(ENGINE_PATH.."/system")
+--engine.config = require(ENGINE_PATH.."/config")
 engine.thread = require(ENGINE_PATH.."/thread")
 engine.serialize = require(ENGINE_PATH.."/serialize")
 engine.layer = require(ENGINE_PATH.."/layer")
@@ -27,5 +28,5 @@ engine.tween = require(ENGINE_PATH.."/tween")
 engine.data = require(ENGINE_PATH.."/data")
 engine.input = require(ENGINE_PATH.."/input")
 
-engine.registerCallbacks()
+engine.system.registerCallbacks()
 return engine
