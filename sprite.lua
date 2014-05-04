@@ -183,19 +183,31 @@ end
     i:updateTransformation()
     return i
 end
---[[
+
 sprite._DOC = {
     new = {
-        "Constructor for scene objects",{ {"string","filename","The scene file to load"} },{ {"scene","scene"} },
+        "Constructor for %sprite%",{ {"number","X"},{"number","Y"},{"source","Source","A source type object that can be drawn"},{"var","Index","Index that tells the drawable what to draw."} },{ {"sprite","Sprite"} },
         INHERIT="geometry",
         methods={
-            loadFile={"Loads a scene",{ {"string","file","The file to load"} }},
-            stop={"Stops the %scene% and calls the scene:onStop() callback"}
+            getSource={"Gets the source used by drawing by this sprite",nil,{ {"source","Source"} }},
+            setSource={"Sets the source for this Sprite",{ {"source","Source"} }},
+            setIndex={"Sets the index for this Sprite",{ {"var","Index"} }},
+            getIndex={"Returns the index for this Sprite",nil,{ {"var","Index"} }},
+            getZIndex={"Returns the Z_index used by the layer to depth sort sprites. Higher numbers mean further on the top.",nil,{ {"number","Z-Index"} }},
+            setZIndex={"Sets the Z_index used by the layer to depth sort sprites. Higher numbers mean further on the top.",{ {"number","Z-Index"} }},
+            setBlendMode={"Sets the blending mode to be used when drawing the sprite. See here for available blendmodes: http://www.love2d.org/wiki/BlendMode",{ {"string","BlendMode"} }},
+            getTint={"Gets the current color(RGBA) the sprite is drawn with.",nil,{ {"number","r"},{"number","g"},{"number","b"},{"number","a"} }},
+            setTint={"Sets the current color(RGBA) the sprite is drawn with.",{ {"number","r"},{"number","g"},{"number","b"},{"number","a"} }},
+            moveTint={"Shifts current color(RGBA) of the sprite by suplied amount.Can be animated by supplying a fifth argument.",{ {"number","r"},{"number","g"},{"number","b"},{"number","a"},{"number","T","Time in seconds"} }},
+            moveTintTo={"Changes the current color(RGBA) to the new value supplied.Can be animated by providing a fifth argument.",{ {"number","r"},{"number","g"},{"number","b"},{"number","a"},{"number","T","Time in seconds"} }},
+            setVisible={"Makes the %sprite% visible or not",{ {"bool","visible"} }},
+            getVisible={"Gets the current visiblity.",nil,{ {"bool","visible"} }},
+            draw={"Draws the sprite to the screen. To be used internally or with a %scriptLayer%."},
         }
     },
-    get = {"Get's a currently loaded scene",{ {"string","name","The filename of the loaded scene"} },{ {"scene","Scene"} }},
-    running={"Get a list of all currently running scenes",nil,{ {"table","list"} }}
+    showBounds = {"Draws debug lines for all sprites",{ {"bool","Show"} }},
+    getShowBounds = {"Returns true if debug lines are currently drawn",nil,{ {"bool","Show"} }}
 }
-]]
+
 return sprite
 
