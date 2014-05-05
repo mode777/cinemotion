@@ -374,4 +374,47 @@ end
     return i
 end
 
+geometry._DOC={
+    update={"Updates all geometry that has been changed since the last cycle."},
+    new={
+        INHERIT="object",
+        "Creates a new %geometry% object.",{ {"number","X"},{"number","Y"},{"number","W"},{"number","H"} },{ {"geometry","Geometry"} },
+        methods = {
+            setChild = {"Link another %geometry% object to this object. E.G. if you move the parent, the child will move by the same amount."},
+            getLayer = {"Returns the layer which is hosting the object."},
+            setLayer = {"Links the object to a layer."},
+            getTweenStyle = {},
+            setTweenStyle = {},
+            isInside = {},
+            getBBox = {},
+            getRectangle = {},
+            updateTransformation = {},
+            getSize = {},
+            setSize = {},
+            projectPoint = {},
+            transformPoint = {},
+            setChild = {},
+            removeChild = {},
+            setPos = {},
+            getPos = {},
+            movePos = {},
+            movePosTo = {},
+            setPiv = {},
+            getPiv = {},
+            movePiv = {},
+            movePivTo = {},
+            setRot = {},
+            getRot = {},
+            moveRot = {},
+            moveRotTo = {},
+            setSca = {},
+            getSca = {},
+            moveSca = {},
+            moveScaTo = {},
+            setGeometryModel = {},
+            getGeometryModel = {},
+        }
+    }
+}
+
 return geometry
