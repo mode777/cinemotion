@@ -380,7 +380,7 @@ geometry._DOC={
         INHERIT="object",
         "Creates a new %geometry% object.",{ {"number","X"},{"number","Y"},{"number","W"},{"number","H"} },{ {"geometry","Geometry"} },
         methods = {
-            setChild = {"Link another %geometry% object to this object. E.G. if you move the parent, the child will move by the same amount."},
+            setChild = {"Link another %geometry% object to this object. E.g. if you move the parent, the child will move by the same amount."},
             getLayer = {"Returns the layer which is hosting the object."},
             setLayer = {"Links the object to a layer."},
             getTweenStyle = {},

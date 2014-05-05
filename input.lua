@@ -208,4 +208,26 @@ function input.newVirtualInput(Name)
     return i
 end
 
+input._DOC = {
+    newVirtualInput = {
+        "Creates or gets an virtual input object. Gives you an object oriented access to the procedural functions. E.g. an A-Button object.",
+        methods={
+            map={"Maps a physical input to the virtual input object. The arguments depends on the type of input",{ {"var","...","Arguments to describe the input"} }},
+            clearMapping={"Deletes all physical input mappings for the virtual input object."},
+            isDown={"Returns true if one of the mapped physical inputs is pressed down.",nil,{ {"bool","down"} }},
+            getValue={"Returns 0 or 1 for digital inputs or a value between 0 and 1 for analogue inputs. If more inputs are mapped will return the lowest value which is not zero",{ {"number","value"} }},
+            isPressed={"Returns true once when one or more of the mapped inputs are pressed",nil,{ {"bool","pressed"} }},
+            isReleased={"Returns true once when one or more of the mapped inputs are released",nil,{ {"bool","released"} }}
+        }
+    },
+    isDown = {"Returns true if the input is down.",{ {"var","input ..."} },{ {"bool","down"} }},
+    isPressed = {"Returns true once the input is pressed",{ {"var","input ..."} },{ {"bool","pressed"} }},
+    isReleased = {"Returns true once the input is released",{ {"var","input ..."} },{ {"bool","released"} }},
+    getVirtualInput = {"Same as newVirtualInput."},
+    getValue = {"Returns 0 or 1 for digital inputs or a value between 0 and 1 for analogue inputs.",{ {"var","input ..."} },{ {"number","value"} }},
+    getMappingTable = {"Returns a table with all registered virtual keys and their mappings. Useful for saving registered inputs.",nil,{ {"table","mappings"} }},
+    getCurrentInput = {"Returns the input that is currently pressed or nil. Very useful for input configurations",nil,{ {"var","input ..."} }},
+    setMappingTable = {}
+}
+
 return input
