@@ -1,5 +1,25 @@
  local data = {}
 
+function data.clone(t)
+    local ct = {}
+    for i=1,#t do
+        if type(t[i]) == "table" then
+            ct[i] = data.clone(t[i])
+        else
+            ct[i] = t[i]
+        end
+    end
+    return ct
+end
+
+function data.compare(t1,t2)
+    if #t1 ~= #t2 then return end
+    for i=1, #t1 do
+        if t1[i] ~= t2[i] then return end
+    end
+    return true
+end
+
 function data.equals(a,b)
     if type(a) == "table" then
         for i=1, #a do

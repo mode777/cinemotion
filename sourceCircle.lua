@@ -9,7 +9,8 @@ function sourceCircle.new(Mode)
        local index = sprite:getIndex()
        if index then circle(mode, index,index,index) end
     end
-    function i:getSize(index)
+    function i:getSize(sprite)
+        local index = sprite:getIndex()
         return index*2, index*2
     end
     function i:setMode(Mode)

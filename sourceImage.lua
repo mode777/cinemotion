@@ -6,7 +6,6 @@ function drawableImage.new(Path)
     local img
 
     function i:draw(sprite)
-        local img = i:getImage()
         local iw,ih = self:getSize()
         local sw,sh = sprite:getSize()
 

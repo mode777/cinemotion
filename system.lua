@@ -2,6 +2,7 @@ local system = {}
 
 local layer     = require(ENGINE_PATH.."/layer")
 local thread    = require(ENGINE_PATH.."/thread")
+local animation = require(ENGINE_PATH.."/animation")
 local event     = require(ENGINE_PATH.."/event")
 local config    = require(ENGINE_PATH.."/config")
 local tween     = require(ENGINE_PATH.."/tween")
@@ -9,6 +10,7 @@ local geometry  = require(ENGINE_PATH.."/geometry")
 local sprite    = require(ENGINE_PATH.."/sprite")
 local scene     = require(ENGINE_PATH.."/scene")
 local asset     = require(ENGINE_PATH.."/asset")
+local particleSystem  = require(ENGINE_PATH.."/sourceParticleSystem")
 
 local oldprint = print
 local printstack = {}
@@ -77,6 +79,8 @@ local function update(dt)
     tween.update(dt)
     geometry.update()
     thread.update()
+    animation.update(dt)
+    particleSystem.update(dt)
     --engine.event.update()
     eventQueue = {}
 end
@@ -96,6 +100,9 @@ local function keypressed(key, u)
         local assets = asset.getAssets()
         print("List of loaded assets:")
         for name in pairs(assets) do print(name) end
+    end
+    if key == "p" then
+        print(particleSystem.getActive())
     end
     if key == "f4" and love.keyboard.isDown("lalt") then love.event.quit() end
     eventQueue["keypressed"] = {key,u}

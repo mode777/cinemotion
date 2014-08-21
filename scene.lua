@@ -16,11 +16,11 @@ function scene.new(file)
     function i:loadFile(file)
         local sce = love.filesystem.load(file)()
         filename = file
-        func = function()
-            if sce.onLoad then sce.onLoad(self) end
+        func = function(...)
+            if sce.onLoad then sce.onLoad(self,...) end
             if sce.onUpdate then
                 while not stop do
-                    sce.onUpdate(self)
+                    sce.onUpdate(self,love.timer.getDelta())
                     thread.yield()
                 end
             end

@@ -13,9 +13,10 @@ function drawableFont.new(path, size)
         asset.set(path,fnt)
     end
 
-    function i:getSize(index, lineWidth)
+    function i:getSize(sprite)
+        local index = sprite:getIndex()
         if index then
-            local width, lines = fnt:getWrap(index, lineWidth or math.huge)
+            local width, lines = fnt:getWrap(index, sprite.getLineWidth() or math.huge)
             return width, lines*fnt:getHeight()
         else
             return 0, fnt:getHeight()

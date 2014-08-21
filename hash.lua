@@ -33,11 +33,6 @@ function hash.new(CellX, CellY)
                 end
             end
         end
-        if sprite:isGroup() then
-            for _,child in ipairs(sprite:getChildren()) do
-                self:insertSprite(child)
-            end
-        end
 
         sprite:setLayer(self,true)
         return sprite

@@ -13,7 +13,7 @@ function asset.getName(Data)
 end
 
 function asset.set(Filename,Data)
-    if datas[Filename] then
+    if datas[Filename] and type(Filename) == "string" then --index exists
         if datas[Filename] ~= Data then
             local i = 2
             while datas[Filename.."("..i..")"] do i = i+1 end

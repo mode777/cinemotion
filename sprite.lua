@@ -6,6 +6,7 @@ local floor = math.floor
 local tween = require (ENGINE_PATH.."/tween")
 local geometry = require(ENGINE_PATH.."/geometry")
 local event = require(ENGINE_PATH.."/event")
+--local input = require(ENGINE_PATH.."/input")
 
 local showBounds = false
 
@@ -33,8 +34,8 @@ function sprite.new(X,Y,Source,Index)
 
     local i = geometry.new(X,Y)
     function i:setSource(Source)
-        if index then i:setSize(Source:getSize(index)) end
         source = Source
+        if index then i:setSize(Source:getSize(self)) end
         self:updateTransformation()
     end
 
@@ -43,8 +44,9 @@ function sprite.new(X,Y,Source,Index)
     end
 
     function i:setIndex(Index)
-        if source then i:setSize(source:getSize(Index)) end
+        if index == Index then return end
         index = Index
+        if source then i:setSize(source:getSize(self)) end
     end
 
     function i:getIndex()
@@ -59,7 +61,7 @@ function sprite.new(X,Y,Source,Index)
         z_index = z
     end
 
-    function i:setBlendmode(bm)
+    function i:setBlendMode(bm)
         blendmode = bm
     end
 
@@ -73,11 +75,25 @@ function sprite.new(X,Y,Source,Index)
         tint = {r or 255,g or 255, b or 255, a or 255}
     end
 
+    function i:setOpacity(a,t)
+        local r,g,b
+        if tint then
+            r,g,b = tint[1],tint[2],tint[3]
+        else
+            r,g,b = 255,255,255
+        end
+        self:moveTintTo(r,g,b,a,t)
+    end
+
+    local function c(v)
+        return math.max(math.min(255,v),0)
+    end
+
     function i:moveTint(r,g,b,a,T)
         if tintTween then tintTween:kill() end
         if not tint then i:setTint(255,255,255,255) end
         if not T then
-            tint = {tint[1]+r, tint[2]+g, tint[3]+b, tint[4]+a }
+            tint = {c(tint[1]+r), c(tint[2]+g), c(tint[3]+b), c(tint[4]+a) }
         else
             local style = self:getTweenStyle()
             tintTween = tween.new(
@@ -104,26 +120,6 @@ function sprite.new(X,Y,Source,Index)
         return i:moveTint(r,g,b,a,T)
     end
 
-    function i:playAnimation(Animation, Delay, Style, Dir)
-        if animation then self:stopAnimation() end
-        animation = thread.new(function()
-            local loop = true
-            while loop do
-                for i=1, #Animation do
-                    self:setIndex(Animation[i])
-                    thread.wait(Delay)
-                end
-                if Style ~= "loop" then loop = false end
-            end
-        end)
-
-        animation:run()
-    end
-
-    function i:stopAnimation()
-        animation:kill()
-    end
-
     function i:registerEvent(Name, Func)
         event.register(Name,Func,self)
     end
@@ -140,21 +136,23 @@ function sprite.new(X,Y,Source,Index)
 
     function i:getVisible(bool)
         return visible
-end
+    end
 
     function i:draw()
         if visible then
             love.graphics.push()
             local x,y = i:getPos()
             local pivx,pivy = i:getPiv()
-            love.graphics.translate(floor(x+0.5),floor(y+0.5))
+            love.graphics.translate(floor(x),floor(y))
             love.graphics.rotate(i:getRot())
             love.graphics.scale(i:getSca())
             love.graphics.translate(-pivx,-pivy)
             if blendmode then setBlendMode(blendmode) end
             if tint then setColor(unpack(tint)) end
             local ox1,oy1,ox2,oy2 = self:getBBox()
-            if source then source:draw(self) end
+            if source then
+                source:draw(self)
+            end
             setColor(255,255,255,255)
             love.graphics.setBlendMode("alpha")
             love.graphics.pop()
@@ -174,9 +172,64 @@ end
         end
     end
 
+    function i:isClicked(but)
+        if cine.input.isPressed("mouse",but) then
+            local x,y = love.mouse.getPosition()
+            local l = self:getLayer()
+            if l then
+                x,y = l:toLayer(x,y)
+            end
+            local x1,y1,x2,y2 = self:getBBox()
+            return x1<x and x2>x and y1<y and y2>y
+        end
+    end
+
+    function i:isMouseOver()
+        local x,y = love.mouse.getPosition()
+        local l = self:getLayer()
+        if l then
+            x,y = l:toLayer(x,y)
+        end
+        local x1,y1,x2,y2 = self:getBBox()
+        return x1<x and x2>x and y1<y and y2>y
+    end
+
+    local cAnimation
+
+    function i:playAnimation(ani,style,delay)
+        if cAnimation then cAnimation:kill() end
+        cAnimation = ani:newPlayer(self,style,delay)
+        cAnimation:play()
+    end
+
+    function i:stopAnimation()
+        if cAnimation then
+            cAnimation:kill()
+        end
+    end
+
+    local twidth
+    function i:setTextWidth(Width)
+        twidth = Width
+        if source then i:setSize(source:getSize(self)) end
+    end
+
+    function i:getTextWidth()
+        return twidth
+    end
+
+    local talign
+    function i:setTextAlign(Align)
+        talign = Align
+    end
+
+    function i:getTextAlign()
+        return talign
+    end
+
     function i:isGroup()
         return false
-end
+    end
 
     if Source then i:setSource(Source) end
     if Index then i:setIndex(Index) else i:setIndex(1) end

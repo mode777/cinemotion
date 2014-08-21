@@ -21,8 +21,8 @@ function sourceRectangle.new(LineWidth, LineColor)
     function i:setLineWidth( w )
         lineWidth = w
     end
-    function i:getSize(index)
-
+    function i:getSize(sprite)
+        local index = sprite:getIndex()
         --if type(index) ~= "table" then return error("sourceRectangle needs a table as index. Given: "..tostring(index)) end
         if index then
             return index[1],index[2]

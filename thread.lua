@@ -9,16 +9,22 @@ function thread.new(Func)
     local func
     --interface for a thread
     local i = {}
-    function i:run()
+    function i:run(...)
         if not func then error("Thread needs a function to run") end
         co = coroutine.create(func)
         threads[co] = true
-        assert(resume(co))
+        assert(resume(co,...))
         return self
     end
     function i:isFinished()
         if co then
             return status(co) == "dead"
+        end
+    end
+
+    function i:isRunning()
+        if co then
+            return not status(co) == "dead"
         end
     end
 
@@ -63,6 +69,20 @@ end
 function thread.wait(s)
     local t = time()
     while time() < t+s do thread.yield() end
+end
+
+function thread.waitKey(s)
+    local t = time()
+    while time() < t+s do
+        local i,j,k,l = cine.input.getCurrentInput()
+        if i then
+            while not cine.input.isReleased(i,j,k,l) and time() < t+s do
+                thread.yield()
+            end
+            if cine.input.isReleased(i,j,k,l) then break end
+        end
+        thread.yield()
+    end
 end
 
 function thread.active()

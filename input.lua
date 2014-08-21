@@ -2,7 +2,6 @@ local input = {}
 local mapping = {}
 local system = require(ENGINE_PATH.."/system")
 
-
 function input.getCurrentInput()
     if system.getLoveEvent("joystickpressed") then
         local joystick, button = system.getLoveEvent("joystickpressed")
@@ -157,8 +156,13 @@ function input.isReleased(Type,...)
     end
 end
 
-function input.getVirtualInput(Name)
-    return input.newVirtualInput(Name)
+function input.getVirtualInput(...)
+    local args = {...}
+    local inputs = {}
+    for i=1, #args do
+        table.insert(inputs, input.newVirtualInput(args[i]))
+    end
+    return unpack(inputs)
 end
 
 function input.setMappingTable(t)
@@ -186,6 +190,7 @@ function input.newVirtualInput(Name)
         for i=1, #mapping[Name] do
             if input.isDown(unpack(mapping[Name][i])) then return true end
         end
+        return false
     end
     function i:getValue()
         local returnValue
@@ -198,6 +203,7 @@ function input.newVirtualInput(Name)
         for i=1, #mapping[Name] do
             if input.isPressed(unpack(mapping[Name][i])) then return true end
         end
+        return false
     end
     function i:isReleased()
         for i=1, #mapping[Name] do

@@ -1,12 +1,15 @@
 local grid = {}
 
-function grid.new(W,H)
+function grid.new(W,H,Data)
     local tw, th = W or 0, H or 0
-    local data = {}
+    local data = Data or {}
     local i = {}
 
     function i:clear()
-        data = nil
+        data = {}
+        for i = 1, tw*th do
+            data[i] = false
+        end
     end
 
     function i:setData(table)
@@ -39,7 +42,6 @@ function grid.new(W,H)
     end
 
     function i:getIndex(x,y)
-        local f = math.floor
         x,y = x-1,y-1
         x,y = x%tw, y%th
         return (y*tw+x)+1
@@ -60,12 +62,58 @@ function grid.new(W,H)
         return buffer
     end
 
+    function  i:shiftRow(y,amnt)
+        if amnt > 0 then
+            for i=1, amnt do
+                for x=tw, 2, -1 do
+                    data[self:getIndex(x,y)],data[self:getIndex(x-1,y)] = data[self:getIndex(x-1,y)], data[self:getIndex(x,y)]
+                end
+            end
+        elseif amnt < 0 then
+            for i=1, math.abs(amnt) do
+                for x=1, tw-1 do
+                    data[self:getIndex(x,y)],data[self:getIndex(x+1,y)] = data[self:getIndex(x+1,y)], data[self:getIndex(x,y)]
+                end
+            end
+        end
+    end
+
+    function i:shiftCollumn(x,amnt)
+        if amnt > 0 then
+            for i=1, amnt do
+                for y=th, 2, -1 do
+                    data[self:getIndex(x,y)],data[self:getIndex(x,y-1)] = data[self:getIndex(x,y-1)], data[self:getIndex(x,y)]
+                end
+            end
+        elseif amnt < 0 then
+            for i=1, math.abs(amnt) do
+                for y=1, th-1 do
+                    data[self:getIndex(x,y)],data[self:getIndex(x,y+1)] = data[self:getIndex(x,y+1)], data[self:getIndex(x,y)]
+                end
+            end
+        end
+    end
+
     function i:getCollumn(x)
         local buffer = {}
         for y=1, th do
             table.insert(buffer,self:getCell(x,y))
         end
         return buffer
+    end
+
+    function i:getSubgrid(X,Y,W,H)
+        if X+W-1 > self:getWidth() then W = self:getWidth()-X+1 end
+        if Y+H-1 > self:getHeight() then H = self:getHeight()-H end
+        local g = grid.new(W,H)
+        local buffer = {}
+        for y=Y, Y+H-1  do
+            for x=X, X+W-1 do
+                table.insert(buffer, self:getCell(x,y))
+            end
+        end
+        g:setData(buffer)
+        return g
     end
 
     function i:setRow(y, Data)

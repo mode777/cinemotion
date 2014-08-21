@@ -3,15 +3,22 @@ local event = require(ENGINE_PATH.."/event")
 local object = require(ENGINE_PATH.."/object")
 
 local update = {}
+local hasChanged = {}
 
 local geometry = {}
 
 local geometryUpToDate = false
 
 function geometry.update()
+    for i=1, #hasChanged do
+       hasChanged[i]:setHasChanged(false)
+    end
+    hasChanged = {}
     for geo, _ in pairs(update) do
         geo:updateTransformation()
         update[geo] = nil
+        geo:setHasChanged(true)
+        table.insert(hasChanged,geo)
     end
 end
 
@@ -27,6 +34,9 @@ function geometry.new(X,Y,W,H)
     local sin = math.sin
     local min = math.min
     local max = math.max
+    local alignw,alignh = "left", "top"
+    local changed = false
+    local bounds
 
     local i = object.new{}
 
@@ -63,17 +73,17 @@ function geometry.new(X,Y,W,H)
     end
 
     function i:removeChild(Geometry)
-        local x, y = Geometry:getPos()
-        local rot = Geometry:getRot()
-        local scax,scay = Geometry:getSca()
+        --local x, y = Geometry:getPos()
+        --local rot = Geometry:getRot()
+        --local scax,scay = Geometry:getSca()
         self:unsetAttributeLink(Geometry,"pos_x")
         self:unsetAttributeLink(Geometry,"pos_y")
         self:unsetAttributeLink(Geometry,"rot")
         self:unsetAttributeLink(Geometry,"sca_x")
         self:unsetAttributeLink(Geometry,"sca_y")
-        Geometry:setPos(x,y)
-        Geometry:setRot(rot)
-        Geometry:setSca(scax,scay)
+        Geometry:setPos(Geometry:getPos())
+        Geometry:setRot(Geometry:getRot())
+        Geometry:setSca(Geometry:getSca())
     end
 
     local moveTween
@@ -98,17 +108,41 @@ function geometry.new(X,Y,W,H)
     --return x,y
     end
 
+    function i:getX()
+        return self:getAttribute("pos_x")
+    end
+
+    function i:getY()
+        return self:getAttribute("pos_y")
+    end
+
     function i:movePos(X,Y,T)
+        if X == 0 and Y == 0 then return end
+        local bx1,by1,bx2,by2 = self:getBounds()
+        if bx1 then
+            local x1,y1,x2,y2 = self:getBBox()
+            if x1 + X < bx1  or bx2-bx1 < x2-x1 then
+                X = bx1-x1
+            elseif x2 + X > bx2 then
+                X = bx2-x2
+            end
+            if y1 + Y < by1  or by2-by1 < y2-y1 then
+                Y = by1-y1
+            elseif y2 + Y > by2 then
+                Y = by2-y2
+            end
+        end
+
         if moveTween then moveTween:kill() end
         if not T then
             local x,y = self:getRawAttribute("pos_x"), self:getRawAttribute("pos_y")
             if x then setPos(x+X, y+Y)
             else setPos(X, Y) end
-            --x,y = x+X, y+Y
+            return nil, X,Y
         else
             local x, y = self:getRawAttribute("pos_x"), self:getRawAttribute("pos_y")
             moveTween = tween.new({x,y},{x+X,y+Y},T,function(X,Y) setPos(X, Y) end,tweenStyle)
-            return moveTween
+            return moveTween, X,Y
         end
     end
 
@@ -158,6 +192,7 @@ function geometry.new(X,Y,W,H)
         elseif ver == "bottom" then y = h
         else y = h/2
         end
+        alignw,alignh=hor,ver
         self:movePivTo(x,y)
     end
 
@@ -269,12 +304,13 @@ end
     function i:setSize(W,H)
         self:setAttribute("size_x",W)
         self:setAttribute("size_y",H)
+        self:center(alignw,alignh)
     end
 
     function i:getSize()
         return self:getAttribute("size_x"), self:getAttribute("size_y")
     end
-
+    local max = math.max
     function i:updateTransformation()
         --todo: skip recalculating if geometry is up to date but still update hash.
         --if geometryUpToDate then return end
@@ -287,12 +323,12 @@ end
         local ox1,oy1,ox2,oy2 = unpack(bbox)
         local nx1,ny1,nx2,ny2
         if geoModel == "bbox" then
-            nx1,ny1,nx2,ny2 = f(x-pivx),f(y-pivy),f(x+w-pivx),f(y+h-pivy)
+            nx1,ny1,nx2,ny2 = f(x-pivx),f(y-pivy),f(x+max(w-1,0)-pivx),f(y+max(h-1,0)-pivy)
         elseif geoModel == "full" then
             local x1,y1 = self:transformPoint(0,0)
-            local x2,y2 = self:transformPoint(w,0)
-            local x3,y3 = self:transformPoint(w,h)
-            local x4,y4 = self:transformPoint(0,h)
+            local x2,y2 = self:transformPoint(max(w-1,0),0)
+            local x3,y3 = self:transformPoint(max(w-1,0),max(h-1,0))
+            local x4,y4 = self:transformPoint(0,max(h-1,0))
             nx1 = min(x1,x2,x3,x4)
             ny1 = min(y1,y2,y3,y4)
             nx2 = max(x1,x2,x3,x4)
@@ -302,11 +338,11 @@ end
             nx1,ny1 = f(x),f(y)
             nx2,ny2 = nx1,ny1
         end
+
         if not (ox1 == nx1 and oy1 == ny1 and ox2 == nx2 and oy2 == ny2 ) then
             if layer then
                 layer:updateSprite(self,ox1,oy1,ox2,oy2,nx1,ny1,nx2,ny2)
             end
-            event.fire("onMove",self,nx1-ox1,ny1-oy1)
         end
         bbox = {nx1,ny1,nx2,ny2 }
         geometryUpToDate = true
@@ -315,6 +351,14 @@ end
     function i:getBBox()
         if not geometryUpToDate then i:updateTransformation() end
         return unpack(bbox)
+    end
+
+    function i:setBounds(x1,y1,x2,y2)
+        bounds = {x1,y1,x2,y2}
+    end
+
+    function i:getBounds()
+        if bounds then return unpack(bounds) end
     end
 
     function i:getRectangle()
@@ -347,16 +391,15 @@ end
 
     function i:getLineWidth()
         return lwidth
-end
+    end
 
     function i:getTweenStyle()
         return tweenStyle or "linear"
-end
+    end
 
     function i:setTweenStyle(Style)
         tweenStyle = Style
     end
-
 
     function i:setLayer(Layer, dontcall)
         layer = Layer
@@ -365,7 +408,15 @@ end
 
     function i:getLayer()
         return layer
-end
+    end
+
+    function i:setHasChanged(bool)
+        changed = bool
+    end
+
+    function i:hasChanged()
+        return changed
+    end
 
     bbox = {0,0,0,0}
     if X and Y then i:movePosTo(X,Y) end

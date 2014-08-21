@@ -13,7 +13,8 @@ function sourcePoyline.new(W)
     function i:setLineWidth(w)
         lineWidth = w
     end
-    function i:getSize(index)
+    function i:getSize(sprite)
+        local index = sprite:geIndex()
         if type(index) == "number" then return 0,0 end
         local x1,y1,x2,y2
         for i=1, #index do
